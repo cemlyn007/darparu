@@ -1,0 +1,44 @@
+"""
+Renderer. 🤞
+"""
+
+module(
+    name = "darparu",
+    version = "0.0.0",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "apple_support", version = "1.18.0", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+
+#-------------------------------------------------------------
+# Hedron's Compile Commands Extractor for Bazel
+#-------------------------------------------------------------
+
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+git_override(
+    module_name = "hedron_compile_commands",
+    commit = "4f28899228fb3ad0126897876f147ca15026151e",
+    remote = "https://github.com/hedronvision/bazel-compile-commands-extractor.git",
+)
+
+#-------------------------------------------------------------
+# GLFW
+#-------------------------------------------------------------
+
+GLFW_VERSION = "3.4"
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "glfw",
+    build_file = "@//third_party/glfw:BUILD",
+    integrity = "sha256-wDjTQgAjTQcfrpNFvEVeSo8vVEq2AVB2XXcE4I89rAE=",
+    strip_prefix = "glfw-{}".format(GLFW_VERSION),
+    urls = ["https://github.com/glfw/glfw/archive/{}.tar.gz".format(GLFW_VERSION)],
+)
+
+bazel_dep(name = "glew", version = "2.2.0")
