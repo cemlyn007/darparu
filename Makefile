@@ -1,5 +1,5 @@
 refresh:
-	bazel run -c opt --subcommands //:refresh_compile_commands
+	bazel build  //darparu/bin:darparu && bazel run //:refresh_compile_commands
 
 cpu:
 	bazel run  //darparu/bin:darparu \
