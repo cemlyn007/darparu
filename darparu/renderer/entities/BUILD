@@ -60,6 +60,22 @@ cc_library(
 )
 
 cc_library(
+    name = "plane",
+    srcs = ["plane.cc"],
+    hdrs = ["plane.h"],
+    data = ["//darparu/renderer/shaders:simple"],
+    linkopts = opengl_linkopts,
+    deps = [
+        "//darparu/renderer:gl_error_macro",
+        "//darparu/renderer:renderable",
+        "//darparu/renderer:shader",
+        "//darparu/renderer:shader_context_manager",
+        "@glew//:glew_static",
+        "@glfw",
+    ],
+)
+
+cc_library(
     name = "water",
     srcs = ["water.cc"],
     hdrs = ["water.h"],
