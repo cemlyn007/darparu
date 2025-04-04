@@ -17,15 +17,20 @@ constexpr size_t RESOLUTION = 101;
 constexpr float SPACING = 0.02;
 constexpr float WALL_THICKNESS = 0.1;
 
+struct BallConfig {
+  std::array<float, 3> color;
+  std::array<float, 3> position;
+  float radius;
+};
+
 int main(int argc, char *argv[]) {
   renderer::init();
 
   renderer::Renderer renderer(1080, 1080, RESOLUTION, SPACING, WALL_THICKNESS);
 
-  std::vector<renderer::BallConfig> ball_configs = {
-      {{1.0, 0.0, 0.0}, 0.2}, {{0.0, 1.0, 0.0}, 0.3}, {{0.0, 0.0, 1.0}, 0.25}};
-
-  std::vector<std::array<float, 3>> ball_positions = {{-0.5, 1.0, -0.5}, {0.5, 1.0, -0.5}, {0.5, 1.0, 0.5}};
+  std::vector<BallConfig> ball_configs = {{{1.0, 0.0, 0.0}, {-0.5, 1.0, -0.5}, 0.2},
+                                          {{0.0, 1.0, 0.0}, {0.5, 1.0, -0.5}, 0.3},
+                                          {{0.0, 0.0, 1.0}, {0.5, 1.0, 0.5}, 0.25}};
 
   auto light = std::make_shared<renderer::entities::Light>();
   renderer._renderables.emplace_back(light, true);
@@ -66,8 +71,8 @@ int main(int argc, char *argv[]) {
     ball->set_view_position(renderer._camera_position);
     ball->set_view(renderer::eye4d());
     const auto radius = ball_configs[sphere].radius;
-    ball->set_model(renderer::transpose(
-        renderer::translate(renderer::scale(renderer::eye4d(), {radius, radius, radius}), ball_positions[sphere])));
+    ball->set_model(renderer::transpose(renderer::translate(
+        renderer::scale(renderer::eye4d(), {radius, radius, radius}), ball_configs[sphere].position)));
     lambda.emplace_back([ball](const std::array<float, 3> &view_position) { ball->set_view_position(view_position); });
   }
 

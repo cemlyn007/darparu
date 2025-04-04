@@ -7,11 +7,6 @@
 
 namespace darparu::renderer {
 
-struct BallConfig {
-  std::array<float, 3> color;
-  float radius;
-};
-
 void init();
 
 void terminate();
