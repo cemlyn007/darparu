@@ -8,10 +8,7 @@ opengl_linkopts = select({
         "-lGL",
         "-lX11",
     ],
-    "@platforms//os:osx": [
-        "-framework",
-        "OpenGL",
-    ],
+    "@platforms//os:osx": [],
 })
 
 cc_library(
