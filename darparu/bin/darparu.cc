@@ -37,10 +37,9 @@ int main(int argc, char *argv[]) {
 
     ball->set_view_position(renderer._camera_position);
     ball->set_view(renderer::eye4d());
-    // The multiply by 2 for the radii is because the balls are drawn with a radius of 0.5
     const auto radius = ball_configs[sphere].radius;
-    ball->set_model(renderer::transpose(renderer::translate(
-        renderer::scale(renderer::eye4d(), {radius * 2, radius * 2, radius * 2}), ball_positions[sphere])));
+    ball->set_model(renderer::transpose(
+        renderer::translate(renderer::scale(renderer::eye4d(), {radius, radius, radius}), ball_positions[sphere])));
   }
   renderer._renderables = renderer._renderables;
 

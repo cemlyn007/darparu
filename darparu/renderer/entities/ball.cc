@@ -22,7 +22,7 @@ BallData create_ball_mesh() {
   std::vector<unsigned int> indices;
   std::vector<double> normals;
 
-  constexpr double radius = 0.5;
+  constexpr double radius = 1.0;
   constexpr int sectors = 36;
   constexpr int stacks = 18;
 
