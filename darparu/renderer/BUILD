@@ -9,8 +9,6 @@ opengl_linkopts = select({
         "-lX11",
     ],
     "@platforms//os:osx": [
-        "-framework",
-        "OpenGL",
     ],
 })
 
@@ -30,8 +28,6 @@ cc_library(
         ":renderable",
         ":shader",
         "//darparu/renderer:camera",
-        "//darparu/renderer/entities:container",
-        "//darparu/renderer/entities:light",
         "@glew//:glew_static",
         "@glfw",
     ],

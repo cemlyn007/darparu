@@ -7,6 +7,7 @@ cc_binary(
         "//darparu/renderer",
         "//darparu/renderer/entities:ball",
         "//darparu/renderer/entities:container",
+        "//darparu/renderer/entities:light",
         "//darparu/renderer/entities:water",
     ],
 )
