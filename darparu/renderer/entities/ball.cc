@@ -17,7 +17,7 @@ struct BallData {
   std::vector<double> normals;
 };
 
-constexpr BallData create_ball_mesh() {
+BallData create_ball_mesh() {
   std::vector<double> vertices;
   std::vector<unsigned int> indices;
   std::vector<double> normals;

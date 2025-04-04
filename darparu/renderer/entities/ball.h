@@ -1,4 +1,5 @@
 #pragma once
+#include "darparu/renderer/renderable.h"
 #include "darparu/renderer/shader.h"
 #include <GL/glew.h>
 #include <array>
@@ -6,7 +7,7 @@
 
 namespace darparu::renderer::entities {
 
-class Ball {
+class Ball : public Renderable {
 public:
   Ball();
   ~Ball();

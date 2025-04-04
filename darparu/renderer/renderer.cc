@@ -29,11 +29,10 @@ void terminate() {
   glfwTerminate();
 }
 
-Renderer::Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness,
-                   const std::vector<BallConfig> &ball_configs)
+Renderer::Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness)
     : _window(create_window(window_width, window_height)), _escape_pressed(false), _camera(window_width, window_height),
       _light(), _container((resolution - 1) * spacing, wall_thickness), _water(resolution, resolution * spacing, 0.0),
-      _balls(ball_configs.size()), _mouse_click(false) {
+      _renderables(), _mouse_click(false) {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -45,18 +44,16 @@ Renderer::Renderer(int window_width, int window_height, size_t resolution, float
 
   std::array<float, 3> light_position = {1.2, 4.0, 2.0};
 
+  for (auto renderable : _renderables) {
+    renderable->set_projection(_projection);
+    renderable->set_view(_view);
+    renderable->set_view_position(_camera_position);
+    renderable->set_light_color({1.0, 1.0, 1.0});
+    renderable->set_light_position(light_position);
+  }
+
   _light.set_color({1.0, 1.0, 1.0});
   _light.set_model(transpose(translate(scale(eye4d(), {0.2, 0.2, 0.2}), light_position)));
-
-  for (size_t sphere = 0; sphere < ball_configs.size(); ++sphere) {
-    _balls[sphere].set_color(ball_configs[sphere].color);
-    _balls[sphere].set_model(eye4d());
-  }
-
-  for (auto &ball : _balls) {
-    ball.set_light_color({1.0, 1.0, 1.0});
-    ball.set_light_position(light_position);
-  }
 
   float wall_size = (resolution - 1) * spacing;
 
@@ -98,8 +95,12 @@ void Renderer::render(bool rotate_camera) {
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
   _container.draw();
-  for (auto &ball : _balls)
-    ball.draw();
+  for (auto renderable : _renderables) {
+    renderable->set_projection(_projection);
+    renderable->set_view(_view);
+    renderable->set_view_position(_camera_position);
+    renderable->draw();
+  }
   _camera.unbind();
 
   GL_CALL(glViewport(0, 0, _framebuffer_width, _framebuffer_height));
@@ -107,8 +108,12 @@ void Renderer::render(bool rotate_camera) {
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
   _light.draw();
   _container.draw();
-  for (auto &ball : _balls)
-    ball.draw();
+  for (auto renderable : _renderables) {
+    renderable->set_projection(_projection);
+    renderable->set_view(_view);
+    renderable->set_view_position(_camera_position);
+    renderable->draw();
+  }
   _water.draw();
 
   GL_CALL(glfwSwapBuffers(_window));
@@ -126,8 +131,8 @@ void Renderer::on_framebuffer_shape_change() {
   float aspect = static_cast<float>(_framebuffer_width) / static_cast<float>(_framebuffer_height);
   _projection = perspective(radians(60), aspect, 0.01, 100.0);
   _light.set_projection(_projection);
-  for (auto &ball : _balls)
-    ball.set_projection(_projection);
+  for (auto &renderable : _renderables)
+    renderable->set_projection(_projection);
   _container.set_projection(_projection);
   _water.set_projection(_projection);
 }
@@ -141,9 +146,9 @@ void Renderer::update_camera(bool rotate_camera) {
   _camera_position = update_orbit_camera_position(_camera_radians[0], _camera_radians[1], camera_radius);
   _view = look_at(_camera_position, {0.0, 0.5, 0.0}, {0.0, 1.0, 0.0});
   _light.set_view(_view);
-  for (auto &ball : _balls) {
-    ball.set_view(_view);
-    ball.set_view_position(_camera_position);
+  for (auto &renderable : _renderables) {
+    renderable->set_view(_view);
+    renderable->set_view_position(_camera_position);
   }
   _container.set_view(_view);
   _container.set_view_position(_camera_position);

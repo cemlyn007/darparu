@@ -1,10 +1,11 @@
 #pragma once
 #include "darparu/renderer/camera.h"
-#include "darparu/renderer/entities/ball.h"
 #include "darparu/renderer/entities/container.h"
 #include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/entities/water.h"
+#include "darparu/renderer/renderable.h"
 #include <GLFW/glfw3.h>
+#include <memory.h>
 
 namespace darparu::renderer {
 
@@ -35,15 +36,14 @@ private:
   entities::Light _light;
   entities::Container _container;
   entities::Water _water;
-  std::vector<entities::Ball> _balls;
   std::array<float, 16> _projection;
   std::array<float, 16> _view;
 
 public:
-  Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness,
-           const std::vector<BallConfig> &ball_configs);
+  Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness);
   ~Renderer();
 
+  std::vector<std::shared_ptr<Renderable>> _renderables;
   std::array<float, 3> _camera_position;
   bool _mouse_click;
   void render(bool rotate_camera);

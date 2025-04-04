@@ -15,6 +15,11 @@ opengl_linkopts = select({
 })
 
 cc_library(
+    name = "renderable",
+    hdrs = ["renderable.h"],
+)
+
+cc_library(
     name = "renderer",
     srcs = ["renderer.cc"],
     hdrs = ["renderer.h"],
@@ -22,9 +27,9 @@ cc_library(
     deps = [
         ":algebra",
         ":gl_error_macro",
+        ":renderable",
         ":shader",
         "//darparu/renderer:camera",
-        "//darparu/renderer/entities:ball",
         "//darparu/renderer/entities:container",
         "//darparu/renderer/entities:light",
         "//darparu/renderer/entities:water",
