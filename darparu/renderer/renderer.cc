@@ -54,33 +54,11 @@ Renderer::Renderer(int window_width, int window_height, size_t resolution, float
   _light.set_color({1.0, 1.0, 1.0});
   _light.set_model(transpose(translate(scale(eye4d(), {0.2, 0.2, 0.2}), light_position)));
 
-  float wall_size = (resolution - 1) * spacing;
-
-  auto container_water_model = translate(eye4d(), {-wall_size / 2.0f, 0.0, -wall_size / 2.0f});
-
-  // _container.set_color({0.7, 0.7, 0.7});
-  // _container.set_model(transpose(container_water_model));
-
-  // _container.set_light_color({1.0, 1.0, 1.0});
-  // _container.set_light_position(light_position);
-
-  // _water.set_color({0.0, 0.0, 1.0});
-  // _water.set_model(transpose(container_water_model));
-
-  // _water.set_light_color({1.0, 1.0, 1.0});
-  // _water.set_light_position(light_position);
-
-  auto texture = _camera.texture();
-  // _water.set_texture(texture);
-
   _camera_position = {2.5, 3.535534, 2.5};
   _camera_radians[0] = 0.7853982;
   _camera_radians[1] = 0.7853982;
 
   update_camera(false);
-
-  // std::vector<float> heights(resolution * resolution, 1.0);
-  // _water.set_heights(heights);
 }
 
 Renderer::~Renderer() { glfwDestroyWindow(_window); }
@@ -130,7 +108,6 @@ void Renderer::on_framebuffer_shape_change() {
   _light.set_projection(_projection);
   for (auto &[renderable, _] : _renderables)
     renderable->set_projection(_projection);
-  // _water.set_projection(_projection);
 }
 
 void Renderer::update_camera(bool rotate_camera) {
@@ -146,8 +123,6 @@ void Renderer::update_camera(bool rotate_camera) {
     renderable->set_view(_view);
     renderable->set_view_position(_camera_position);
   }
-  // _water.set_view(_view);
-  // _water.set_view_position(_camera_position);
 }
 
 bool Renderer::should_close() { return glfwWindowShouldClose(_window) || _escape_pressed; }
