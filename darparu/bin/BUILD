@@ -6,5 +6,6 @@ cc_binary(
     deps = [
         "//darparu/renderer",
         "//darparu/renderer/entities:ball",
+        "//darparu/renderer/entities:container",
     ],
 )

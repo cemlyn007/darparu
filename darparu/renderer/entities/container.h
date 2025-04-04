@@ -1,4 +1,5 @@
 #pragma once
+#include "darparu/renderer/renderable.h"
 #include "darparu/renderer/shader.h"
 #include <GL/glew.h>
 #include <array>
@@ -6,7 +7,7 @@
 
 namespace darparu::renderer::entities {
 
-class Container {
+class Container : public Renderable {
 public:
   Container(float wall_size, float wall_thickness);
   ~Container();

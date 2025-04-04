@@ -31,8 +31,7 @@ void terminate() {
 
 Renderer::Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness)
     : _window(create_window(window_width, window_height)), _escape_pressed(false), _camera(window_width, window_height),
-      _light(), _container((resolution - 1) * spacing, wall_thickness), _water(resolution, resolution * spacing, 0.0),
-      _renderables(), _mouse_click(false) {
+      _light(), _water(resolution, resolution * spacing, 0.0), _renderables(), _mouse_click(false) {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -59,11 +58,11 @@ Renderer::Renderer(int window_width, int window_height, size_t resolution, float
 
   auto container_water_model = translate(eye4d(), {-wall_size / 2.0f, 0.0, -wall_size / 2.0f});
 
-  _container.set_color({0.7, 0.7, 0.7});
-  _container.set_model(transpose(container_water_model));
+  // _container.set_color({0.7, 0.7, 0.7});
+  // _container.set_model(transpose(container_water_model));
 
-  _container.set_light_color({1.0, 1.0, 1.0});
-  _container.set_light_position(light_position);
+  // _container.set_light_color({1.0, 1.0, 1.0});
+  // _container.set_light_position(light_position);
 
   _water.set_color({0.0, 0.0, 1.0});
   _water.set_model(transpose(container_water_model));
@@ -94,7 +93,6 @@ void Renderer::render(bool rotate_camera) {
   _camera.bind();
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-  _container.draw();
   for (auto renderable : _renderables) {
     renderable->set_projection(_projection);
     renderable->set_view(_view);
@@ -107,7 +105,6 @@ void Renderer::render(bool rotate_camera) {
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
   _light.draw();
-  _container.draw();
   for (auto renderable : _renderables) {
     renderable->set_projection(_projection);
     renderable->set_view(_view);
@@ -133,7 +130,6 @@ void Renderer::on_framebuffer_shape_change() {
   _light.set_projection(_projection);
   for (auto &renderable : _renderables)
     renderable->set_projection(_projection);
-  _container.set_projection(_projection);
   _water.set_projection(_projection);
 }
 
@@ -150,8 +146,6 @@ void Renderer::update_camera(bool rotate_camera) {
     renderable->set_view(_view);
     renderable->set_view_position(_camera_position);
   }
-  _container.set_view(_view);
-  _container.set_view_position(_camera_position);
   _water.set_view(_view);
   _water.set_view_position(_camera_position);
 }

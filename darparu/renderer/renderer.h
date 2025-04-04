@@ -34,7 +34,6 @@ private:
 
   Camera _camera;
   entities::Light _light;
-  entities::Container _container;
   entities::Water _water;
   std::array<float, 16> _projection;
   std::array<float, 16> _view;

@@ -1,5 +1,6 @@
 #include "darparu/renderer/algebra.h"
 #include "darparu/renderer/entities/ball.h"
+#include "darparu/renderer/entities/container.h"
 #include "darparu/renderer/renderer.h"
 #include "math.h"
 #include <chrono>
@@ -24,6 +25,17 @@ int main(int argc, char *argv[]) {
 
   std::vector<std::array<float, 3>> ball_positions = {{-0.5, 1.0, -0.5}, {0.5, 1.0, -0.5}, {0.5, 1.0, 0.5}};
 
+  auto container = std::make_shared<renderer::entities::Container>((RESOLUTION - 1) * SPACING, WALL_THICKNESS);
+  renderer._renderables.emplace_back(container);
+  container->set_projection(renderer::eye4d());
+  float wall_size = (RESOLUTION - 1) * SPACING;
+  auto container_water_model = renderer::translate(renderer::eye4d(), {-wall_size / 2.0f, 0.0, -wall_size / 2.0f});
+  container->set_color({0.7, 0.7, 0.7});
+  container->set_model(renderer::transpose(container_water_model));
+  container->set_light_color({1.0, 1.0, 1.0});
+  container->set_light_position({1.2, 4.0, 2.0});
+  container->set_view_position(renderer._camera_position);
+  container->set_view(renderer::eye4d());
   for (size_t sphere = 0; sphere < ball_configs.size(); ++sphere) {
     std::cout << "Creating ball " << sphere << " with radius " << ball_configs[sphere].radius << "\n";
     auto ball = std::make_shared<renderer::entities::Ball>();
