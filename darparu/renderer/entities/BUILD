@@ -71,6 +71,7 @@ cc_library(
         ":water_normals",
         "//darparu/renderer:algebra",
         "//darparu/renderer:gl_error_macro",
+        "//darparu/renderer:renderable",
         "//darparu/renderer:shader",
         "//darparu/renderer:shader_context_manager",
         "//darparu/renderer:texture",

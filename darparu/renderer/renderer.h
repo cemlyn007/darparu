@@ -1,11 +1,10 @@
 #pragma once
 #include "darparu/renderer/camera.h"
-#include "darparu/renderer/entities/container.h"
 #include "darparu/renderer/entities/light.h"
-#include "darparu/renderer/entities/water.h"
 #include "darparu/renderer/renderable.h"
 #include <GLFW/glfw3.h>
 #include <memory.h>
+#include <vector>
 
 namespace darparu::renderer {
 
@@ -32,9 +31,7 @@ private:
   int _window_width, _window_height;
   int _framebuffer_width, _framebuffer_height;
 
-  Camera _camera;
   entities::Light _light;
-  entities::Water _water;
   std::array<float, 16> _projection;
   std::array<float, 16> _view;
 
@@ -42,7 +39,8 @@ public:
   Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness);
   ~Renderer();
 
-  std::vector<std::shared_ptr<Renderable>> _renderables;
+  Camera _camera;
+  std::vector<std::tuple<std::shared_ptr<Renderable>, bool>> _renderables;
   std::array<float, 3> _camera_position;
   bool _mouse_click;
   void render(bool rotate_camera);

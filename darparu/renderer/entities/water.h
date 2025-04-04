@@ -1,4 +1,5 @@
 #pragma once
+#include "darparu/renderer/renderable.h"
 #include "darparu/renderer/shader.h"
 #include "darparu/renderer/texture.h"
 #include <GL/glew.h>
@@ -7,7 +8,7 @@
 
 namespace darparu::renderer::entities {
 
-class Water {
+class Water : public Renderable {
 public:
   Water(size_t resolution, float size, float xz_offset);
   ~Water();

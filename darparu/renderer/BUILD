@@ -32,7 +32,6 @@ cc_library(
         "//darparu/renderer:camera",
         "//darparu/renderer/entities:container",
         "//darparu/renderer/entities:light",
-        "//darparu/renderer/entities:water",
         "@glew//:glew_static",
         "@glfw",
     ],

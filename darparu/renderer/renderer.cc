@@ -31,7 +31,7 @@ void terminate() {
 
 Renderer::Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness)
     : _window(create_window(window_width, window_height)), _escape_pressed(false), _camera(window_width, window_height),
-      _light(), _water(resolution, resolution * spacing, 0.0), _renderables(), _mouse_click(false) {
+      _light(), _renderables(), _mouse_click(false) {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -43,7 +43,7 @@ Renderer::Renderer(int window_width, int window_height, size_t resolution, float
 
   std::array<float, 3> light_position = {1.2, 4.0, 2.0};
 
-  for (auto renderable : _renderables) {
+  for (auto [renderable, _] : _renderables) {
     renderable->set_projection(_projection);
     renderable->set_view(_view);
     renderable->set_view_position(_camera_position);
@@ -64,14 +64,14 @@ Renderer::Renderer(int window_width, int window_height, size_t resolution, float
   // _container.set_light_color({1.0, 1.0, 1.0});
   // _container.set_light_position(light_position);
 
-  _water.set_color({0.0, 0.0, 1.0});
-  _water.set_model(transpose(container_water_model));
+  // _water.set_color({0.0, 0.0, 1.0});
+  // _water.set_model(transpose(container_water_model));
 
-  _water.set_light_color({1.0, 1.0, 1.0});
-  _water.set_light_position(light_position);
+  // _water.set_light_color({1.0, 1.0, 1.0});
+  // _water.set_light_position(light_position);
 
   auto texture = _camera.texture();
-  _water.set_texture(texture);
+  // _water.set_texture(texture);
 
   _camera_position = {2.5, 3.535534, 2.5};
   _camera_radians[0] = 0.7853982;
@@ -79,8 +79,8 @@ Renderer::Renderer(int window_width, int window_height, size_t resolution, float
 
   update_camera(false);
 
-  std::vector<float> heights(resolution * resolution, 1.0);
-  _water.set_heights(heights);
+  // std::vector<float> heights(resolution * resolution, 1.0);
+  // _water.set_heights(heights);
 }
 
 Renderer::~Renderer() { glfwDestroyWindow(_window); }
@@ -93,11 +93,12 @@ void Renderer::render(bool rotate_camera) {
   _camera.bind();
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-  for (auto renderable : _renderables) {
+  for (auto [renderable, reflect_draw] : _renderables) {
     renderable->set_projection(_projection);
     renderable->set_view(_view);
     renderable->set_view_position(_camera_position);
-    renderable->draw();
+    if (reflect_draw)
+      renderable->draw();
   }
   _camera.unbind();
 
@@ -105,13 +106,12 @@ void Renderer::render(bool rotate_camera) {
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
   _light.draw();
-  for (auto renderable : _renderables) {
+  for (auto [renderable, _] : _renderables) {
     renderable->set_projection(_projection);
     renderable->set_view(_view);
     renderable->set_view_position(_camera_position);
     renderable->draw();
   }
-  _water.draw();
 
   GL_CALL(glfwSwapBuffers(_window));
   _last_mouse_position_in_pixels[0] = _mouse_position_in_pixels[0];
@@ -128,9 +128,9 @@ void Renderer::on_framebuffer_shape_change() {
   float aspect = static_cast<float>(_framebuffer_width) / static_cast<float>(_framebuffer_height);
   _projection = perspective(radians(60), aspect, 0.01, 100.0);
   _light.set_projection(_projection);
-  for (auto &renderable : _renderables)
+  for (auto &[renderable, _] : _renderables)
     renderable->set_projection(_projection);
-  _water.set_projection(_projection);
+  // _water.set_projection(_projection);
 }
 
 void Renderer::update_camera(bool rotate_camera) {
@@ -142,12 +142,12 @@ void Renderer::update_camera(bool rotate_camera) {
   _camera_position = update_orbit_camera_position(_camera_radians[0], _camera_radians[1], camera_radius);
   _view = look_at(_camera_position, {0.0, 0.5, 0.0}, {0.0, 1.0, 0.0});
   _light.set_view(_view);
-  for (auto &renderable : _renderables) {
+  for (auto &[renderable, _] : _renderables) {
     renderable->set_view(_view);
     renderable->set_view_position(_camera_position);
   }
-  _water.set_view(_view);
-  _water.set_view_position(_camera_position);
+  // _water.set_view(_view);
+  // _water.set_view_position(_camera_position);
 }
 
 bool Renderer::should_close() { return glfwWindowShouldClose(_window) || _escape_pressed; }
