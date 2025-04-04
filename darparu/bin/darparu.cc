@@ -1,10 +1,12 @@
 #include "darparu/renderer/algebra.h"
 #include "darparu/renderer/entities/ball.h"
 #include "darparu/renderer/entities/container.h"
+#include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/entities/water.h"
 #include "darparu/renderer/renderer.h"
 #include "math.h"
 #include <chrono>
+#include <functional>
 #include <iostream>
 
 using namespace std::chrono_literals;
@@ -25,6 +27,18 @@ int main(int argc, char *argv[]) {
 
   std::vector<std::array<float, 3>> ball_positions = {{-0.5, 1.0, -0.5}, {0.5, 1.0, -0.5}, {0.5, 1.0, 0.5}};
 
+  auto light = std::make_shared<renderer::entities::Light>();
+  renderer._renderables.emplace_back(light, true);
+  auto light_position = std::array<float, 3>{1.2, 4.0, 2.0};
+  light->set_projection(renderer::eye4d());
+  light->set_model(
+      renderer::transpose(renderer::translate(renderer::scale(renderer::eye4d(), {0.2, 0.2, 0.2}), light_position)));
+  light->set_color({1.0, 1.0, 1.0});
+  light->set_view(renderer::eye4d());
+  light->set_color({1.0, 1.0, 1.0});
+
+  std::vector<std::function<void(const std::array<float, 3> &)>> lambda;
+
   auto container = std::make_shared<renderer::entities::Container>((RESOLUTION - 1) * SPACING, WALL_THICKNESS);
   renderer._renderables.emplace_back(container, true);
   container->set_projection(renderer::eye4d());
@@ -33,9 +47,11 @@ int main(int argc, char *argv[]) {
   container->set_color({0.7, 0.7, 0.7});
   container->set_model(renderer::transpose(container_water_model));
   container->set_light_color({1.0, 1.0, 1.0});
-  container->set_light_position({1.2, 4.0, 2.0});
+  container->set_light_position(light_position);
   container->set_view_position(renderer._camera_position);
   container->set_view(renderer::eye4d());
+  lambda.emplace_back(
+      [container](const std::array<float, 3> &view_position) { container->set_view_position(view_position); });
 
   for (size_t sphere = 0; sphere < ball_configs.size(); ++sphere) {
     auto ball = std::make_shared<renderer::entities::Ball>();
@@ -45,13 +61,14 @@ int main(int argc, char *argv[]) {
     ball->set_color(ball_configs[sphere].color);
 
     ball->set_light_color({1.0, 1.0, 1.0});
-    ball->set_light_position({1.2, 4.0, 2.0});
+    ball->set_light_position(light_position);
 
     ball->set_view_position(renderer._camera_position);
     ball->set_view(renderer::eye4d());
     const auto radius = ball_configs[sphere].radius;
     ball->set_model(renderer::transpose(
         renderer::translate(renderer::scale(renderer::eye4d(), {radius, radius, radius}), ball_positions[sphere])));
+    lambda.emplace_back([ball](const std::array<float, 3> &view_position) { ball->set_view_position(view_position); });
   }
 
   auto water = std::make_shared<renderer::entities::Water>(RESOLUTION, RESOLUTION * SPACING, 0.0f);
@@ -60,16 +77,20 @@ int main(int argc, char *argv[]) {
   water->set_model(renderer::transpose(container_water_model));
 
   water->set_light_color({1.0, 1.0, 1.0});
-  water->set_light_position({1.2, 4.0, 2.0});
+  water->set_light_position(light_position);
 
   auto texture = renderer._camera.texture();
   water->set_texture(texture);
 
   water->set_heights(std::vector<float>(RESOLUTION * RESOLUTION, 0.8f));
+  lambda.emplace_back([water](const std::array<float, 3> &view_position) { water->set_view_position(view_position); });
 
   auto us = 1us;
   auto start = std::chrono::high_resolution_clock::now();
   while (!renderer.should_close()) {
+    for (const auto &lambda : lambda) {
+      lambda(renderer._camera_position);
+    }
     renderer.render(renderer._mouse_click);
     auto end = std::chrono::high_resolution_clock::now();
     us = std::chrono::duration_cast<std::chrono::microseconds>(end - start);

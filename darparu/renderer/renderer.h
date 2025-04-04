@@ -1,6 +1,5 @@
 #pragma once
 #include "darparu/renderer/camera.h"
-#include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/renderable.h"
 #include <GLFW/glfw3.h>
 #include <memory.h>
@@ -31,7 +30,6 @@ private:
   int _window_width, _window_height;
   int _framebuffer_width, _framebuffer_height;
 
-  entities::Light _light;
   std::array<float, 16> _projection;
   std::array<float, 16> _view;
 

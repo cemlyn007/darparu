@@ -31,7 +31,7 @@ void terminate() {
 
 Renderer::Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness)
     : _window(create_window(window_width, window_height)), _escape_pressed(false), _camera(window_width, window_height),
-      _light(), _renderables(), _mouse_click(false) {
+      _renderables(), _mouse_click(false) {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -41,18 +41,10 @@ Renderer::Renderer(int window_width, int window_height, size_t resolution, float
 
   on_framebuffer_shape_change();
 
-  std::array<float, 3> light_position = {1.2, 4.0, 2.0};
-
   for (auto [renderable, _] : _renderables) {
     renderable->set_projection(_projection);
     renderable->set_view(_view);
-    renderable->set_view_position(_camera_position);
-    renderable->set_light_color({1.0, 1.0, 1.0});
-    renderable->set_light_position(light_position);
   }
-
-  _light.set_color({1.0, 1.0, 1.0});
-  _light.set_model(transpose(translate(scale(eye4d(), {0.2, 0.2, 0.2}), light_position)));
 
   _camera_position = {2.5, 3.535534, 2.5};
   _camera_radians[0] = 0.7853982;
@@ -74,7 +66,6 @@ void Renderer::render(bool rotate_camera) {
   for (auto [renderable, reflect_draw] : _renderables) {
     renderable->set_projection(_projection);
     renderable->set_view(_view);
-    renderable->set_view_position(_camera_position);
     if (reflect_draw)
       renderable->draw();
   }
@@ -83,11 +74,9 @@ void Renderer::render(bool rotate_camera) {
   GL_CALL(glViewport(0, 0, _framebuffer_width, _framebuffer_height));
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-  _light.draw();
   for (auto [renderable, _] : _renderables) {
     renderable->set_projection(_projection);
     renderable->set_view(_view);
-    renderable->set_view_position(_camera_position);
     renderable->draw();
   }
 
@@ -105,7 +94,6 @@ void Renderer::on_framebuffer_shape_change() {
   _camera.resize(_framebuffer_width, _framebuffer_height);
   float aspect = static_cast<float>(_framebuffer_width) / static_cast<float>(_framebuffer_height);
   _projection = perspective(radians(60), aspect, 0.01, 100.0);
-  _light.set_projection(_projection);
   for (auto &[renderable, _] : _renderables)
     renderable->set_projection(_projection);
 }
@@ -118,10 +106,8 @@ void Renderer::update_camera(bool rotate_camera) {
   }
   _camera_position = update_orbit_camera_position(_camera_radians[0], _camera_radians[1], camera_radius);
   _view = look_at(_camera_position, {0.0, 0.5, 0.0}, {0.0, 1.0, 0.0});
-  _light.set_view(_view);
   for (auto &[renderable, _] : _renderables) {
     renderable->set_view(_view);
-    renderable->set_view_position(_camera_position);
   }
 }
 

@@ -16,11 +16,6 @@ public:
 
   // Methods to set object and light properties
   virtual void set_color(const std::array<float, 3> &color) = 0;
-  virtual void set_light_position(const std::array<float, 3> &position) = 0;
-  virtual void set_light_color(const std::array<float, 3> &color) = 0;
-
-  // Method to set the view position
-  virtual void set_view_position(const std::array<float, 3> &position) = 0;
 };
 
 } // namespace darparu::renderer

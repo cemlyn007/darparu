@@ -54,6 +54,7 @@ cc_library(
     linkopts = opengl_linkopts,
     deps = [
         "//darparu/renderer:gl_error_macro",
+        "//darparu/renderer:renderable",
         "//darparu/renderer:shader",
         "//darparu/renderer:shader_context_manager",
         "@glew//:glew_static",

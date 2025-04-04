@@ -1,11 +1,12 @@
 #pragma once
+#include "darparu/renderer/renderable.h"
 #include "darparu/renderer/shader.h"
 #include <GL/glew.h>
 #include <array>
 
 namespace darparu::renderer::entities {
 
-class Light {
+class Light : public Renderable {
 public:
   Light();
   ~Light();
