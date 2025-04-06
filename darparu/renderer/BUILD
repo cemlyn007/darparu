@@ -24,6 +24,7 @@ cc_library(
     linkopts = opengl_linkopts,
     deps = [
         ":algebra",
+        ":camera",
         ":gl_error_macro",
         ":io_control",
         ":projection_context",
@@ -33,6 +34,11 @@ cc_library(
         "@glew//:glew_static",
         "@glfw",
     ],
+)
+
+cc_library(
+    name = "camera",
+    hdrs = ["camera.h"],
 )
 
 cc_library(

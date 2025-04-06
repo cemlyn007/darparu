@@ -2,7 +2,6 @@
 #include "darparu/renderer/algebra.h"
 #include "darparu/renderer/gl_error_macro.h"
 #include <GL/glew.h>
-#include <cmath>
 #include <iostream>
 
 static void glfwErrorCallback(int error, const char *description) {
@@ -55,19 +54,19 @@ Renderer::Renderer(std::string window_name, int window_width, int window_height,
     renderable->set_view(_view);
   }
 
-  _camera_position = {2.5, 3.535534, 2.5};
-  _camera_radians[0] = 0.7853982;
-  _camera_radians[1] = 0.7853982;
+  _camera._position = {2.5, 3.535534, 2.5};
+  _camera._radians[0] = 0.7853982;
+  _camera._radians[1] = 0.7853982;
 
   update_camera();
 }
 
 Renderer::~Renderer() { glfwDestroyWindow(_window); }
 
-void Renderer::render(bool rotate_camera) {
+void Renderer::render() {
   glfwMakeContextCurrent(_window);
 
-  update_camera(rotate_camera);
+  update_camera();
 
   _camera_texture.bind();
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
@@ -116,20 +115,16 @@ void Renderer::set_projection_function(ProjectionFunction projection_function) {
   update_projection();
 }
 
-void Renderer::update_camera(bool rotate_camera) {
-  if (rotate_camera) {
-    _camera_radians[0] =
-        std::fmod(_camera_radians[0] + radians(_io_control._mouse_position_change_in_pixels[0]), (2 * M_PI));
-    _camera_radians[1] =
-        std::fmod(_camera_radians[1] + radians(_io_control._mouse_position_change_in_pixels[1]), (2 * M_PI));
-  }
-  update_camera();
-}
-
 void Renderer::update_camera() {
-  float camera_radius = std::min(std::max(0.0, norm(_camera_position) + _io_control._scroll_offset), 25.0);
-  _camera_position = update_orbit_camera_position(_camera_radians[0], _camera_radians[1], camera_radius);
-  _view = look_at(_camera_position, {0.0, 0.5, 0.0}, {0.0, 1.0, 0.0});
+  if (_io_control._mouse_click) {
+    _camera._radians[0] =
+        std::fmod(_camera._radians[0] + radians(_io_control._mouse_position_change_in_pixels[0]), (2 * M_PI));
+    _camera._radians[1] =
+        std::fmod(_camera._radians[1] + radians(_io_control._mouse_position_change_in_pixels[1]), (2 * M_PI));
+  }
+  float camera_radius = std::min(std::max(0.0, norm(_camera._position) + _io_control._scroll_offset), 25.0);
+  _camera._position = update_orbit_camera_position(_camera._radians[0], _camera._radians[1], camera_radius);
+  _view = look_at(_camera._position, {0.0, 0.5, 0.0}, {0.0, 1.0, 0.0});
   for (auto &[renderable, _] : _renderables)
     renderable->set_view(_view);
 }

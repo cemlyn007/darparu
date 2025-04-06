@@ -1,4 +1,5 @@
 #pragma once
+#include "darparu/renderer/camera.h"
 #include "darparu/renderer/camera_texture.h"
 #include "darparu/renderer/io_control.h"
 #include "darparu/renderer/projection_context.h"
@@ -34,12 +35,11 @@ public:
   ~Renderer();
 
   IoControl _io_control;
+  Camera _camera;
   CameraTexture _camera_texture;
   std::vector<std::tuple<std::shared_ptr<Renderable>, bool>> _renderables;
-  std::array<float, 2> _camera_radians;
-  std::array<float, 3> _camera_position;
   void update_camera();
-  void render(bool rotate_camera);
+  void render();
   bool should_close();
   std::array<float, 3> get_cursor_direction();
 

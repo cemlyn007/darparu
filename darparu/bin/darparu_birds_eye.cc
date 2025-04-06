@@ -25,12 +25,12 @@ int main(int argc, char *argv[]) {
         return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
       },
       renderer::IoControl());
-  renderer._camera_position = {0.0, 1.0, 0.0};
+  renderer._camera._position = {0.0, 1.0, 0.0};
   std::array<float, 3> camera_focus = {0.0, 0.0, 0.0};
-  renderer._camera_radians[0] =
-      std::atan2(renderer._camera_position[1] - camera_focus[1], renderer._camera_position[0] - camera_focus[0]);
-  renderer._camera_radians[1] =
-      std::atan2(renderer._camera_position[1] - camera_focus[1], renderer._camera_position[2] - camera_focus[2]);
+  renderer._camera._radians[0] =
+      std::atan2(renderer._camera._position[1] - camera_focus[1], renderer._camera._position[0] - camera_focus[0]);
+  renderer._camera._radians[1] =
+      std::atan2(renderer._camera._position[1] - camera_focus[1], renderer._camera._position[2] - camera_focus[2]);
   renderer.update_camera();
 
   auto light = std::make_shared<renderer::entities::Light>();
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   plane->set_model(renderer::transpose(plane_model));
   plane->set_light_color({1.0, 1.0, 1.0});
   plane->set_light_position(light_position);
-  plane->set_view_position(renderer._camera_position);
+  plane->set_view_position(renderer._camera._position);
   plane->set_view(renderer::eye4d());
   lambda.emplace_back([plane](const std::array<float, 3> &view_position) { plane->set_view_position(view_position); });
 
@@ -78,9 +78,9 @@ int main(int argc, char *argv[]) {
   auto start = std::chrono::high_resolution_clock::now();
   while (!renderer.should_close()) {
     for (const auto &lambda : lambda) {
-      lambda(renderer._camera_position);
+      lambda(renderer._camera._position);
     }
-    renderer.render(renderer._io_control._mouse_click);
+    renderer.render();
     auto end = std::chrono::high_resolution_clock::now();
     us = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     std::cout << "Frame time: " << us.count() << "us\n";
