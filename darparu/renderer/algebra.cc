@@ -102,6 +102,41 @@ std::array<float, 16> scale(const std::array<float, 16> &matrix, const std::arra
   return multiply_matrices(matrix, scaling);
 }
 
+std::array<float, 16> rotate(const std::array<float, 16> &matrix, const std::array<float, 3> &axis,
+                             float angle_radians) {
+  // Normalize the rotation axis
+  std::array<float, 3> n = normalize(axis);
+
+  // Compute trigonometric values for the rotation
+  float c = std::cos(angle_radians);
+  float s = std::sin(angle_radians);
+  float t = 1.0f - c;
+
+  // Create a 4x4 identity matrix for rotation
+  std::array<float, 16> rotation = eye4d();
+  std::span rotation_md(rotation.data(), 4 * 4);
+
+  // Fill in the rotation matrix (Rodrigues' rotation formula)
+  // First row
+  rotation_md[0 * 4 + 0] = c + n[0] * n[0] * t;
+  rotation_md[0 * 4 + 1] = n[0] * n[1] * t - n[2] * s;
+  rotation_md[0 * 4 + 2] = n[0] * n[2] * t + n[1] * s;
+
+  // Second row
+  rotation_md[1 * 4 + 0] = n[0] * n[1] * t + n[2] * s;
+  rotation_md[1 * 4 + 1] = c + n[1] * n[1] * t;
+  rotation_md[1 * 4 + 2] = n[1] * n[2] * t - n[0] * s;
+
+  // Third row
+  rotation_md[2 * 4 + 0] = n[0] * n[2] * t - n[1] * s;
+  rotation_md[2 * 4 + 1] = n[1] * n[2] * t + n[0] * s;
+  rotation_md[2 * 4 + 2] = c + n[2] * n[2] * t;
+
+  // Multiply the input matrix by the rotation matrix.
+  // This is equivalent to: result = matrix dot rotation_matrix.
+  return multiply_matrices(matrix, rotation);
+}
+
 std::array<float, 16> transpose(const std::array<float, 16> &matrix) {
   std::array<float, 16> transposed{};
 

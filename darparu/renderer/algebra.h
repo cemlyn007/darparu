@@ -31,6 +31,9 @@ std::array<float, 16> translate(const std::array<float, 16> &matrix, const std::
 
 std::array<float, 16> scale(const std::array<float, 16> &matrix, const std::array<float, 3> &vector);
 
+std::array<float, 16> rotate(const std::array<float, 16> &matrix, const std::array<float, 3> &axis,
+                             float angle_radians);
+
 std::array<float, 16> look_at(const std::array<float, 3> &eye, const std::array<float, 3> &center,
                               const std::array<float, 3> &up);
 
