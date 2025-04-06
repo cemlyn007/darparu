@@ -1,8 +1,8 @@
-#include "darparu/renderer/camera.h"
+#include "darparu/renderer/camera_texture.h"
 #include <stdexcept>
 
 namespace darparu::renderer {
-Camera::Camera(int width, int height) : _width(width), _height(height) {
+CameraTexture::CameraTexture(int width, int height) : _width(width), _height(height) {
   glGenFramebuffers(1, &_framebuffer);
   glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 
@@ -32,13 +32,13 @@ Camera::Camera(int width, int height) : _width(width), _height(height) {
   unbind();
 }
 
-Camera::~Camera() {
+CameraTexture::~CameraTexture() {
   glDeleteRenderbuffers(1, &_depth_render_buffer);
   glDeleteFramebuffers(1, &_framebuffer);
   glDeleteTextures(1, &rendered_texture);
 }
 
-void Camera::resize(int width, int height) {
+void CameraTexture::resize(int width, int height) {
   _width = width;
   _height = height;
 
@@ -61,13 +61,13 @@ void Camera::resize(int width, int height) {
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, rendered_texture, 0);
 }
 
-void Camera::bind() {
+void CameraTexture::bind() {
   glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
   glViewport(0, 0, _width, _height);
 }
 
-void Camera::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+void CameraTexture::unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-Texture Camera::texture() { return Texture(rendered_texture); }
+Texture CameraTexture::texture() { return Texture(rendered_texture); }
 
 } // namespace darparu::renderer

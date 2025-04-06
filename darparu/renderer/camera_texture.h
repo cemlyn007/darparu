@@ -5,12 +5,12 @@
 #include "darparu/renderer/texture.h"
 
 namespace darparu::renderer {
-class Camera {
+class CameraTexture {
 public:
   GLuint rendered_texture;
 
-  Camera(int width, int height);
-  ~Camera();
+  CameraTexture(int width, int height);
+  ~CameraTexture();
 
   void resize(int width, int height);
   void bind();

@@ -130,9 +130,8 @@ void Renderer::update_camera() {
   float camera_radius = std::min(std::max(0.0, norm(_camera_position) + _scroll_offset), 25.0);
   _camera_position = update_orbit_camera_position(_camera_radians[0], _camera_radians[1], camera_radius);
   _view = look_at(_camera_position, {0.0, 0.5, 0.0}, {0.0, 1.0, 0.0});
-  for (auto &[renderable, _] : _renderables) {
+  for (auto &[renderable, _] : _renderables)
     renderable->set_view(_view);
-  }
 }
 
 bool Renderer::should_close() { return glfwWindowShouldClose(_window) || _escape_pressed; }

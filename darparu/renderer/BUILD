@@ -28,16 +28,16 @@ cc_library(
         ":projection_context",
         ":renderable",
         ":shader",
-        "//darparu/renderer:camera",
+        "//darparu/renderer:camera_texture",
         "@glew//:glew_static",
         "@glfw",
     ],
 )
 
 cc_library(
-    name = "camera",
-    srcs = ["camera.cc"],
-    hdrs = ["camera.h"],
+    name = "camera_texture",
+    srcs = ["camera_texture.cc"],
+    hdrs = ["camera_texture.h"],
     linkopts = opengl_linkopts,
     deps = [
         ":gl_error_macro",

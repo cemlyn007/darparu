@@ -1,5 +1,5 @@
 #pragma once
-#include "darparu/renderer/camera.h"
+#include "darparu/renderer/camera_texture.h"
 #include "darparu/renderer/projection_context.h"
 #include "darparu/renderer/renderable.h"
 #include <GLFW/glfw3.h>
@@ -37,7 +37,7 @@ public:
   Renderer(std::string window_name, int window_width, int window_height);
   ~Renderer();
 
-  Camera _camera;
+  CameraTexture _camera;
   std::vector<std::tuple<std::shared_ptr<Renderable>, bool>> _renderables;
   std::array<float, 2> _camera_radians;
   std::array<float, 3> _camera_position;
