@@ -117,14 +117,12 @@ void Renderer::set_projection_function(ProjectionFunction projection_function) {
 
 void Renderer::update_camera() {
   if (_io_control._mouse_click) {
-    _camera._radians[0] =
-        std::fmod(_camera._radians[0] + radians(_io_control._mouse_position_change_in_pixels[0]), (2 * M_PI));
-    _camera._radians[1] =
-        std::fmod(_camera._radians[1] + radians(_io_control._mouse_position_change_in_pixels[1]), (2 * M_PI));
+    _camera._radians[0] += radians(_io_control._mouse_position_change_in_pixels[0]);
+    _camera._radians[1] += radians(_io_control._mouse_position_change_in_pixels[1]);
   }
-  float camera_radius = std::min(std::max(0.0, norm(_camera._position) + _io_control._scroll_offset), 25.0);
-  _camera._position = update_orbit_camera_position(_camera._radians[0], _camera._radians[1], camera_radius);
-  _view = look_at(_camera._position, {0.0, 0.5, 0.0}, {0.0, 1.0, 0.0});
+  float camera_radius = norm(_camera._position) + _io_control._scroll_offset;
+  _camera._position = multiply(normalize(_camera._position), camera_radius);
+  _view = _camera.update();
   for (auto &[renderable, _] : _renderables)
     renderable->set_view(_view);
 }

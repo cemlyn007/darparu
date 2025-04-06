@@ -13,6 +13,8 @@ float radians(float degrees);
 
 float norm(std::array<float, 3> vector);
 
+std::array<float, 3> multiply(const std::array<float, 3> &a, const float &b);
+
 std::array<float, 3> normalize(const std::array<float, 3> &vector);
 
 std::array<float, 3> update_orbit_camera_position(float azimuth_radians, float elevation_radians, float radius);

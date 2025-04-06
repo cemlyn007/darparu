@@ -11,6 +11,8 @@ float norm(std::array<float, 3> vector) {
   return std::sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
 }
 
+std::array<float, 3> multiply(const std::array<float, 3> &a, const float &b) { return {a[0] * b, a[1] * b, a[2] * b}; };
+
 std::array<float, 3> normalize(const std::array<float, 3> &vector) {
   float denominator = norm(vector);
   return {
