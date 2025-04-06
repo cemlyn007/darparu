@@ -9,3 +9,11 @@ cc_library(
         "//darparu/renderer:camera",
     ],
 )
+
+cc_library(
+    name = "pan",
+    hdrs = ["pan.h"],
+    deps = [
+        "//darparu/renderer:camera",
+    ],
+)
