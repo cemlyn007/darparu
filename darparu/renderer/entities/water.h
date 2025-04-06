@@ -10,7 +10,7 @@ namespace darparu::renderer::entities {
 
 class Water : public Renderable {
 public:
-  Water(size_t resolution, float size, float xz_offset);
+  Water(size_t resolution, float xz_offset);
   ~Water();
 
   void set_view(const std::array<float, 16> &view);

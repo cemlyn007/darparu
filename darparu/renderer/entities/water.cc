@@ -55,12 +55,12 @@ WaterData grid_vertices_normals_and_indices(int n_cells_x, int n_cells_z, double
   return {vertices, normals, indices};
 }
 
-Water::Water(size_t resolution, float length, float xz_offset)
+Water::Water(size_t resolution, float xz_offset)
     : _resolution(resolution), _shader(read_file("darparu/renderer/shaders/basic_lighting.vs"),
                                        read_file("darparu/renderer/shaders/basic_lighting.fs")),
       _xz_vbo(0), _y_vbo(0), _normal_vbo(0), _vao(0), _ebo(0), _vertex_normals(3 * _resolution * _resolution),
       _face_normals((_resolution - 1) * (_resolution - 1) * 2 * 3), _count(_resolution * _resolution, 0) {
-  WaterData mesh_data = grid_vertices_normals_and_indices(_resolution, _resolution, length / (_resolution));
+  WaterData mesh_data = grid_vertices_normals_and_indices(_resolution, _resolution, 1.0f / (_resolution - 1));
   std::transform(mesh_data.vertices.begin(), mesh_data.vertices.end(), mesh_data.vertices.begin(),
                  [&](auto &value) { return value + xz_offset; });
   _xz = mesh_data.vertices;

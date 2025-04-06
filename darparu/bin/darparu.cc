@@ -78,10 +78,11 @@ int main(int argc, char *argv[]) {
     lambda.emplace_back([ball](const std::array<float, 3> &view_position) { ball->set_view_position(view_position); });
   }
 
-  auto water = std::make_shared<renderer::entities::Water>(RESOLUTION, RESOLUTION * SPACING, 0.0f);
+  auto water = std::make_shared<renderer::entities::Water>(RESOLUTION, 0.0f);
   renderer._renderables.emplace_back(water, false);
   water->set_color({0.0, 0.0, 1.0});
-  water->set_model(renderer::transpose(container_water_model));
+  water->set_model(
+      renderer::transpose(renderer::scale(container_water_model, {RESOLUTION * SPACING, 1.0, RESOLUTION * SPACING})));
 
   water->set_light_color({1.0, 1.0, 1.0});
   water->set_light_position(light_position);
