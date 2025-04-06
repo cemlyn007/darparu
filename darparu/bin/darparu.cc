@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   auto light = std::make_shared<renderer::entities::Light>();
   renderer._renderables.emplace_back(light, true);
-  auto light_position = std::array<float, 3>{1.2, 4.0, 2.0};
+  auto light_position = std::array<float, 3>{0.0, 4.0, 0.0};
   light->set_projection(renderer::eye4d());
   light->set_model(
       renderer::transpose(renderer::translate(renderer::scale(renderer::eye4d(), {0.2, 0.2, 0.2}), light_position)));
@@ -50,8 +50,7 @@ int main(int argc, char *argv[]) {
   auto container = std::make_shared<renderer::entities::Container>((RESOLUTION - 1) * SPACING, WALL_THICKNESS);
   renderer._renderables.emplace_back(container, true);
   container->set_projection(renderer::eye4d());
-  float wall_size = (RESOLUTION - 1) * SPACING;
-  auto container_water_model = renderer::translate(renderer::eye4d(), {-wall_size / 2.0f, 0.0, -wall_size / 2.0f});
+  auto container_water_model = renderer::eye4d();
   container->set_color({0.7, 0.7, 0.7});
   container->set_model(renderer::transpose(container_water_model));
   container->set_light_color({1.0, 1.0, 1.0});

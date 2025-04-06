@@ -30,8 +30,8 @@ WaterData grid_vertices_normals_and_indices(int n_cells_x, int n_cells_z, double
   indices.reserve(n_cells_x * n_cells_z * 6);
   for (size_t x = 0; x < vertices_x; ++x) {
     for (size_t z = 0; z < vertices_z; ++z) {
-      vertices.push_back(x * cell_size);
-      vertices.push_back(z * cell_size);
+      vertices.push_back((x * cell_size) - (cell_size * (vertices_x - 1)) / 2.0f);
+      vertices.push_back(z * cell_size - (cell_size * (vertices_z - 1)) / 2.0f);
       normals.push_back(0.0f);
       normals.push_back(1.0f);
       normals.push_back(0.0f);

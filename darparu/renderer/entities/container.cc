@@ -73,6 +73,11 @@ MeshData create_mesh(float size, float wall_thickness) {
   mesh.vertices = {0, 0, 0, 0, size, 0, size, 0, 0, 0, size, 0, size, 0, size, 0, size, 0, 0, 0, size, 0, size, 0};
   mesh.indices = {2, 1, 0, 0, 3, 2};
 
+  for (size_t i = 0; i < mesh.vertices.size(); i += 3) {
+    mesh.vertices[i] -= size / 2;
+    mesh.vertices[i + 2] -= size / 2;
+  }
+
   const std::array walls = {
       std::pair{std::array{size, height_scale, wall_thickness}, std::array{0.0f, 0.0f, size}},
       std::pair{std::array{wall_thickness, height_scale, size}, std::array{size, 0.0f, 0.0f}},
@@ -82,9 +87,9 @@ MeshData create_mesh(float size, float wall_thickness) {
   };
   for (const auto &[scaling, translation] : walls) {
     for (size_t i = 0; i < cube.vertices.size(); i += 3) {
-      const float x = cube.vertices[i] * scaling[0] + translation[0];
+      const float x = cube.vertices[i] * scaling[0] + translation[0] - size / 2;
       const float y = cube.vertices[i + 1] * scaling[1] + translation[1];
-      const float z = cube.vertices[i + 2] * scaling[2] + translation[2];
+      const float z = cube.vertices[i + 2] * scaling[2] + translation[2] - size / 2;
       mesh.vertices.insert(mesh.vertices.end(), {x, y, z});
       mesh.vertices.insert(mesh.vertices.end(), cube.normals.begin() + i, cube.normals.begin() + i + 3);
     }
