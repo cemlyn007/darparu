@@ -17,6 +17,14 @@ filegroup(
 )
 
 filegroup(
+    name = "simple_with_normal_matrix",
+    srcs = [
+        "simple_with_normal_matrix.fs",
+        "simple_with_normal_matrix.vs",
+    ],
+)
+
+filegroup(
     name = "basic_lighting",
     srcs = [
         "basic_lighting.fs",

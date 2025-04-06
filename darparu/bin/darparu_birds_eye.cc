@@ -1,9 +1,9 @@
 #include "darparu/renderer/algebra.h"
-#include "darparu/renderer/cameras/orbit.h"
+#include "darparu/renderer/cameras/pan.h"
 #include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/entities/plane.h"
 #include "darparu/renderer/entities/water.h"
-#include "darparu/renderer/io_controls/simple_3d.h"
+#include "darparu/renderer/io_controls/simple_2d.h"
 #include "darparu/renderer/projection_context.h"
 #include "darparu/renderer/renderer.h"
 #include "math.h"
@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
 using namespace darparu;
 
 constexpr size_t RESOLUTION = 101;
-constexpr float SPACING = 0.02;
+constexpr float SPACING = 0.001;
 
 int main(int argc, char *argv[]) {
   renderer::init();
@@ -25,18 +25,10 @@ int main(int argc, char *argv[]) {
       [](const renderer::ProjectionContext &context) {
         return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
       },
-      std::make_shared<renderer::Simple3DIoControl>(), std::make_shared<renderer::OrbitCamera>());
-  renderer._camera->_position = {0.0, 1.0, 0.0};
-  std::array<float, 3> camera_focus = {0.0, 0.0, 0.0};
-  renderer._camera->_radians[0] =
-      std::atan2(renderer._camera->_position[1] - camera_focus[1], renderer._camera->_position[0] - camera_focus[0]);
-  renderer._camera->_radians[1] =
-      std::atan2(renderer._camera->_position[1] - camera_focus[1], renderer._camera->_position[2] - camera_focus[2]);
-  renderer.update_camera();
-
+      std::make_shared<renderer::Simple2DIoControl>(), std::make_shared<renderer::PanCamera>());
   auto light = std::make_shared<renderer::entities::Light>();
-  renderer._renderables.emplace_back(light, true);
-  auto light_position = std::array<float, 3>{1.2, 4.0, 2.0};
+  renderer._renderables.emplace_back(light, false);
+  auto light_position = std::array<float, 3>{0.0, 0.0, -0.5};
   light->set_projection(renderer::eye4d());
   light->set_model(
       renderer::transpose(renderer::translate(renderer::scale(renderer::eye4d(), {0.2, 0.2, 0.2}), light_position)));
@@ -47,24 +39,25 @@ int main(int argc, char *argv[]) {
   std::vector<std::function<void(const std::array<float, 3> &)>> lambda;
 
   auto plane = std::make_shared<renderer::entities::Plane>();
-  renderer._renderables.emplace_back(plane, true);
+  renderer._renderables.emplace_back(plane, false);
   plane->set_projection(renderer::eye4d());
-  float wall_size = (RESOLUTION - 1) * SPACING;
-  auto plane_model = renderer::translate(renderer::scale(renderer::eye4d(), {2.0, 1.0, 2.0}),
-                                         {-wall_size / 2.0f, 0.0, -wall_size / 2.0f});
+  // Note to take care about set normal matrix,
+  //  since it should only be fed rotations.
+  auto plane_model_rotation = renderer::transpose(renderer::rotate(renderer::eye4d(), {1.0, 0.0, 0.0}, M_PI_2));
+  plane->set_normal_matrix(plane_model_rotation);
   plane->set_color({0.7, 0.7, 0.7});
-  plane->set_model(renderer::transpose(plane_model));
+  plane->set_model(plane_model_rotation);
   plane->set_light_color({1.0, 1.0, 1.0});
   plane->set_light_position(light_position);
   plane->set_view_position(renderer._camera->_position);
   plane->set_view(renderer::eye4d());
   lambda.emplace_back([plane](const std::array<float, 3> &view_position) { plane->set_view_position(view_position); });
 
-  auto water = std::make_shared<renderer::entities::Water>(RESOLUTION, RESOLUTION * SPACING, 0.0f);
+  auto water = std::make_shared<renderer::entities::Water>(RESOLUTION, 0.0f);
   renderer._renderables.emplace_back(water, false);
   water->set_color({0.0, 0.0, 1.0});
-  auto container_water_model = renderer::translate(renderer::eye4d(), {-wall_size / 2.0f, 0.0, -wall_size / 2.0f});
-  water->set_model(renderer::transpose(container_water_model));
+  water->set_model(renderer::transpose(renderer::rotate(
+      renderer::scale(renderer::eye4d(), {RESOLUTION * SPACING, 1.0, RESOLUTION * SPACING}), {1.0, 0.0, 0.0}, M_PI_2)));
 
   water->set_light_color({1.0, 1.0, 1.0});
   water->set_light_position(light_position);
@@ -72,7 +65,7 @@ int main(int argc, char *argv[]) {
   auto texture = renderer._camera_texture.texture();
   water->set_texture(texture);
 
-  water->set_heights(std::vector<float>(RESOLUTION * RESOLUTION, 0.8f));
+  water->set_heights(std::vector<float>(RESOLUTION * RESOLUTION, 0.1f));
   lambda.emplace_back([water](const std::array<float, 3> &view_position) { water->set_view_position(view_position); });
 
   auto us = 1us;

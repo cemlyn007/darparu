@@ -15,6 +15,7 @@ public:
   void set_view(const std::array<float, 16> &view);
   void set_view_position(const std::array<float, 3> &position);
   void set_projection(const std::array<float, 16> &projection);
+  void set_normal_matrix(const std::array<float, 16> &normal_matrix);
   void set_model(const std::array<float, 16> &model);
   void set_color(const std::array<float, 3> &color);
   void set_light_position(const std::array<float, 3> &position);

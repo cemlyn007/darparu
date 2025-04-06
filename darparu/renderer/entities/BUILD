@@ -63,7 +63,7 @@ cc_library(
     name = "plane",
     srcs = ["plane.cc"],
     hdrs = ["plane.h"],
-    data = ["//darparu/renderer/shaders:simple"],
+    data = ["//darparu/renderer/shaders:simple_with_normal_matrix"],
     linkopts = opengl_linkopts,
     deps = [
         "//darparu/renderer:gl_error_macro",

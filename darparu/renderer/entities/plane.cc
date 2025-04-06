@@ -5,6 +5,7 @@
 #include <GL/glew.h>
 
 #include <array>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -19,11 +20,16 @@ MeshData create_mesh() {
   MeshData mesh;
   mesh.vertices = {0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0};
   mesh.indices = {2, 1, 0, 0, 3, 2};
+  for (size_t i = 0; i < mesh.vertices.size(); i += 6) {
+    mesh.vertices[i] -= 0.5f;
+    mesh.vertices[i + 2] -= 0.5f;
+  }
   return mesh;
 }
 
 Plane::Plane()
-    : _shader(read_file("darparu/renderer/shaders/simple.vs"), read_file("darparu/renderer/shaders/simple.fs")),
+    : _shader(read_file("darparu/renderer/shaders/simple_with_normal_matrix.vs"),
+              read_file("darparu/renderer/shaders/simple_with_normal_matrix.fs")),
       _vbo(0), _vao(0), _ebo(0) {
   MeshData mesh_data = create_mesh();
 
@@ -105,6 +111,13 @@ void Plane::set_model(const std::array<float, 16> &model) {
     _shader.set_uniform_matrix("model", model);
   }
 }
+
+void Plane::set_normal_matrix(const std::array<float, 16> &normal_matrix) {
+  ShaderContextManager context(_shader);
+  {
+    _shader.set_uniform_matrix("normalMatrix", normal_matrix);
+  }
+};
 
 void Plane::set_color(const std::array<float, 3> &color) {
   ShaderContextManager context(_shader);
