@@ -60,6 +60,7 @@ Renderer::Renderer(std::string window_name, int window_width, int window_height,
   _camera->_radians[1] = 0.7853982;
 
   update_camera();
+  _camera_texture.unbind();
 }
 
 Renderer::~Renderer() { glfwDestroyWindow(_window); }
