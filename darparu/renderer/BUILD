@@ -25,6 +25,7 @@ cc_library(
     deps = [
         ":algebra",
         ":gl_error_macro",
+        ":io_control",
         ":projection_context",
         ":renderable",
         ":shader",
@@ -51,6 +52,17 @@ cc_library(
     name = "algebra",
     srcs = ["algebra.cc"],
     hdrs = ["algebra.h"],
+)
+
+cc_library(
+    name = "io_control",
+    srcs = ["io_control.cc"],
+    hdrs = ["io_control.h"],
+    deps = [
+        ":gl_error_macro",
+        "@glew//:glew_static",
+        "@glfw",
+    ],
 )
 
 cc_library(

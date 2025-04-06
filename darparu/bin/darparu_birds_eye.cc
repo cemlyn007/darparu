@@ -2,6 +2,7 @@
 #include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/entities/plane.h"
 #include "darparu/renderer/entities/water.h"
+#include "darparu/renderer/io_control.h"
 #include "darparu/renderer/projection_context.h"
 #include "darparu/renderer/renderer.h"
 #include "math.h"
@@ -18,9 +19,12 @@ constexpr float SPACING = 0.02;
 int main(int argc, char *argv[]) {
   renderer::init();
 
-  renderer::Renderer renderer("Darparu", 1080, 1080, [](const renderer::ProjectionContext &context) {
-    return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
-  });
+  renderer::Renderer renderer(
+      "Darparu", 1080, 1080,
+      [](const renderer::ProjectionContext &context) {
+        return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
+      },
+      renderer::IoControl());
   renderer._camera_position = {0.0, 1.0, 0.0};
   std::array<float, 3> camera_focus = {0.0, 0.0, 0.0};
   renderer._camera_radians[0] =
@@ -64,7 +68,7 @@ int main(int argc, char *argv[]) {
   water->set_light_color({1.0, 1.0, 1.0});
   water->set_light_position(light_position);
 
-  auto texture = renderer._camera.texture();
+  auto texture = renderer._camera_texture.texture();
   water->set_texture(texture);
 
   water->set_heights(std::vector<float>(RESOLUTION * RESOLUTION, 0.8f));
@@ -76,7 +80,7 @@ int main(int argc, char *argv[]) {
     for (const auto &lambda : lambda) {
       lambda(renderer._camera_position);
     }
-    renderer.render(renderer._mouse_click);
+    renderer.render(renderer._io_control._mouse_click);
     auto end = std::chrono::high_resolution_clock::now();
     us = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     std::cout << "Frame time: " << us.count() << "us\n";

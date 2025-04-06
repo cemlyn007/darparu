@@ -1,5 +1,6 @@
 #pragma once
 #include "darparu/renderer/camera_texture.h"
+#include "darparu/renderer/io_control.h"
 #include "darparu/renderer/projection_context.h"
 #include "darparu/renderer/renderable.h"
 #include <GLFW/glfw3.h>
@@ -16,12 +17,6 @@ void terminate();
 class Renderer {
 private:
   GLFWwindow *_window;
-  double _scroll_offset;
-  double _mouse_position_in_pixels[2];
-  double _last_mouse_position_in_pixels[2];
-  double _mouse_position_change_in_pixels[2];
-
-  bool _escape_pressed;
 
   int _window_width, _window_height;
   int _framebuffer_width, _framebuffer_height;
@@ -33,15 +28,16 @@ private:
   ProjectionContext _projection_context;
 
 public:
-  Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function);
-  Renderer(std::string window_name, int window_width, int window_height);
+  Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function,
+           IoControl control);
+  Renderer(std::string window_name, int window_width, int window_height, IoControl control);
   ~Renderer();
 
-  CameraTexture _camera;
+  IoControl _io_control;
+  CameraTexture _camera_texture;
   std::vector<std::tuple<std::shared_ptr<Renderable>, bool>> _renderables;
   std::array<float, 2> _camera_radians;
   std::array<float, 3> _camera_position;
-  bool _mouse_click;
   void update_camera();
   void render(bool rotate_camera);
   bool should_close();

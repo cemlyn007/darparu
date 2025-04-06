@@ -29,15 +29,18 @@ void terminate() {
   glfwTerminate();
 }
 
-Renderer::Renderer(std::string window_name, int window_width, int window_height)
-    : Renderer(window_name, window_width, window_height, [](const ProjectionContext &context) {
-        return perspective(radians(60), context.aspect_ratio, context.near_plane, context.far_plane);
-      }) {}
+Renderer::Renderer(std::string window_name, int window_width, int window_height, IoControl control)
+    : Renderer(
+          window_name, window_width, window_height,
+          [](const ProjectionContext &context) {
+            return perspective(radians(60), context.aspect_ratio, context.near_plane, context.far_plane);
+          },
+          control) {}
 
-Renderer::Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function)
-    : _window(create_window(window_name, window_width, window_height)), _escape_pressed(false),
-      _projection_function(projection_function), _camera(window_width, window_height), _renderables(),
-      _mouse_click(false) {
+Renderer::Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function,
+                   IoControl control)
+    : _window(create_window(window_name, window_width, window_height)), _projection_function(projection_function),
+      _io_control(), _camera_texture(window_width, window_height), _renderables() {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -66,7 +69,7 @@ void Renderer::render(bool rotate_camera) {
 
   update_camera(rotate_camera);
 
-  _camera.bind();
+  _camera_texture.bind();
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
   GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
   for (auto [renderable, reflect_draw] : _renderables) {
@@ -75,7 +78,7 @@ void Renderer::render(bool rotate_camera) {
     if (reflect_draw)
       renderable->draw();
   }
-  _camera.unbind();
+  _camera_texture.unbind();
 
   GL_CALL(glViewport(0, 0, _framebuffer_width, _framebuffer_height));
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
@@ -87,18 +90,13 @@ void Renderer::render(bool rotate_camera) {
   }
 
   GL_CALL(glfwSwapBuffers(_window));
-  _last_mouse_position_in_pixels[0] = _mouse_position_in_pixels[0];
-  _last_mouse_position_in_pixels[1] = _mouse_position_in_pixels[1];
-  _scroll_offset = 0.0;
-  GL_CALL(glfwPollEvents());
-  _mouse_position_change_in_pixels[0] = _mouse_position_in_pixels[0] - _last_mouse_position_in_pixels[0];
-  _mouse_position_change_in_pixels[1] = _mouse_position_in_pixels[1] - _last_mouse_position_in_pixels[1];
+  _io_control.update();
 }
 
 void Renderer::on_framebuffer_shape_change() {
   glfwGetFramebufferSize(_window, &_framebuffer_width, &_framebuffer_height);
   glfwGetWindowSize(_window, &_window_width, &_window_height);
-  _camera.resize(_framebuffer_width, _framebuffer_height);
+  _camera_texture.resize(_framebuffer_width, _framebuffer_height);
   update_projection();
 }
 
@@ -120,26 +118,29 @@ void Renderer::set_projection_function(ProjectionFunction projection_function) {
 
 void Renderer::update_camera(bool rotate_camera) {
   if (rotate_camera) {
-    _camera_radians[0] = std::fmod(_camera_radians[0] + radians(_mouse_position_change_in_pixels[0]), (2 * M_PI));
-    _camera_radians[1] = std::fmod(_camera_radians[1] + radians(_mouse_position_change_in_pixels[1]), (2 * M_PI));
+    _camera_radians[0] =
+        std::fmod(_camera_radians[0] + radians(_io_control._mouse_position_change_in_pixels[0]), (2 * M_PI));
+    _camera_radians[1] =
+        std::fmod(_camera_radians[1] + radians(_io_control._mouse_position_change_in_pixels[1]), (2 * M_PI));
   }
   update_camera();
 }
 
 void Renderer::update_camera() {
-  float camera_radius = std::min(std::max(0.0, norm(_camera_position) + _scroll_offset), 25.0);
+  float camera_radius = std::min(std::max(0.0, norm(_camera_position) + _io_control._scroll_offset), 25.0);
   _camera_position = update_orbit_camera_position(_camera_radians[0], _camera_radians[1], camera_radius);
   _view = look_at(_camera_position, {0.0, 0.5, 0.0}, {0.0, 1.0, 0.0});
   for (auto &[renderable, _] : _renderables)
     renderable->set_view(_view);
 }
 
-bool Renderer::should_close() { return glfwWindowShouldClose(_window) || _escape_pressed; }
+bool Renderer::should_close() { return glfwWindowShouldClose(_window) || _io_control._escape_pressed; }
 
 // Kudos goes to: https://antongerdelan.net/opengl/raycasting.html
 std::array<float, 3> Renderer::get_cursor_direction() {
-  std::array<float, 3> nds = {static_cast<float>((2.0 * _mouse_position_in_pixels[0]) / _window_width - 1.0),
-                              static_cast<float>(1.0 - (2.0 * _mouse_position_in_pixels[1]) / _window_height), 1.0f};
+  std::array<float, 3> nds = {
+      static_cast<float>((2.0 * _io_control._mouse_position_in_pixels[0]) / _window_width - 1.0),
+      static_cast<float>(1.0 - (2.0 * _io_control._mouse_position_in_pixels[1]) / _window_height), 1.0f};
   std::array<float, 4> clip = {nds[0], nds[1], -1.0, 1.0f};
   auto inverse_projection = inverse(_projection);
   auto ray_eye_xyzw = multiply_matrix(inverse_projection, clip);
@@ -179,25 +180,22 @@ GLFWwindow *Renderer::create_window(std::string window_name, int width, int heig
 
 void Renderer::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
   Renderer *renderer = static_cast<Renderer *>(glfwGetWindowUserPointer(window));
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    (renderer->_escape_pressed) = true;
+  renderer->_io_control.key_event(key, scancode, action, mods);
 }
 
 void Renderer::mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
   Renderer *renderer = static_cast<Renderer *>(glfwGetWindowUserPointer(window));
-  if (button == GLFW_MOUSE_BUTTON_LEFT)
-    (renderer->_mouse_click) = (action == GLFW_PRESS);
+  renderer->_io_control.mouse_button_event(button, action, mods);
 }
 
 void Renderer::cursor_position_callback(GLFWwindow *window, double xpos, double ypos) {
   Renderer *renderer = static_cast<Renderer *>(glfwGetWindowUserPointer(window));
-  (renderer->_mouse_position_in_pixels[0]) = xpos;
-  (renderer->_mouse_position_in_pixels[1]) = ypos;
+  renderer->_io_control.cursor_position_event(xpos, ypos);
 }
 
 void Renderer::scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
   Renderer *renderer = static_cast<Renderer *>(glfwGetWindowUserPointer(window));
-  (renderer->_scroll_offset) = yoffset;
+  renderer->_io_control.scroll_event(xoffset, yoffset);
 }
 
 void Renderer::framebuffer_size_callback(GLFWwindow *window, int width, int height) {

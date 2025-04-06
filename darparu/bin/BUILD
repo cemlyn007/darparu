@@ -6,6 +6,7 @@ cc_binary(
     deps = [
         "//darparu/renderer",
         "//darparu/renderer:algebra",
+        "//darparu/renderer:io_control",
         "//darparu/renderer:projection_context",
         "//darparu/renderer/entities:container",
         "//darparu/renderer/entities:light",
