@@ -30,11 +30,11 @@ private:
 
 public:
   Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function,
-           IoControl control);
-  Renderer(std::string window_name, int window_width, int window_height, IoControl control);
+           std::shared_ptr<IoControl> control);
+  Renderer(std::string window_name, int window_width, int window_height, std::shared_ptr<IoControl> control);
   ~Renderer();
 
-  IoControl _io_control;
+  std::shared_ptr<IoControl> _io_control;
   Camera _camera;
   CameraTexture _camera_texture;
   std::vector<std::tuple<std::shared_ptr<Renderable>, bool>> _renderables;

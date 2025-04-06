@@ -2,7 +2,7 @@
 #include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/entities/plane.h"
 #include "darparu/renderer/entities/water.h"
-#include "darparu/renderer/io_control.h"
+#include "darparu/renderer/io_controls/simple_3d.h"
 #include "darparu/renderer/projection_context.h"
 #include "darparu/renderer/renderer.h"
 #include "math.h"
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
       [](const renderer::ProjectionContext &context) {
         return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
       },
-      renderer::IoControl());
+      std::make_shared<renderer::Simple3DIoControl>());
   renderer._camera._position = {0.0, 1.0, 0.0};
   std::array<float, 3> camera_focus = {0.0, 0.0, 0.0};
   renderer._camera._radians[0] =

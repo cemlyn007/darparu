@@ -3,7 +3,7 @@
 #include "darparu/renderer/entities/container.h"
 #include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/entities/water.h"
-#include "darparu/renderer/io_control.h"
+#include "darparu/renderer/io_controls/simple_3d.h"
 #include "darparu/renderer/renderer.h"
 #include "math.h"
 #include <chrono>
@@ -27,7 +27,7 @@ struct BallConfig {
 int main(int argc, char *argv[]) {
   renderer::init();
 
-  renderer::Renderer renderer("Darparu", 1080, 1080, renderer::IoControl());
+  renderer::Renderer renderer("Darparu", 1080, 1080, std::make_shared<renderer::Simple3DIoControl>());
 
   std::vector<BallConfig> ball_configs = {{{1.0, 0.0, 0.0}, {-0.5, 1.0, -0.5}, 0.2},
                                           {{0.0, 1.0, 0.0}, {0.5, 1.0, -0.5}, 0.3},

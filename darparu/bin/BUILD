@@ -12,6 +12,7 @@ cc_binary(
         "//darparu/renderer/entities:light",
         "//darparu/renderer/entities:plane",
         "//darparu/renderer/entities:water",
+        "//darparu/renderer/io_controls:simple_3d",
     ],
 )
 
@@ -24,5 +25,6 @@ cc_binary(
         "//darparu/renderer/entities:container",
         "//darparu/renderer/entities:light",
         "//darparu/renderer/entities:water",
+        "//darparu/renderer/io_controls:simple_3d",
     ],
 )
