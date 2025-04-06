@@ -8,6 +8,7 @@ cc_binary(
         "//darparu/renderer:algebra",
         "//darparu/renderer:io_control",
         "//darparu/renderer:projection_context",
+        "//darparu/renderer/cameras:orbit",
         "//darparu/renderer/entities:container",
         "//darparu/renderer/entities:light",
         "//darparu/renderer/entities:plane",
@@ -21,6 +22,7 @@ cc_binary(
     srcs = ["darparu.cc"],
     deps = [
         "//darparu/renderer",
+        "//darparu/renderer/cameras:orbit",
         "//darparu/renderer/entities:ball",
         "//darparu/renderer/entities:container",
         "//darparu/renderer/entities:light",

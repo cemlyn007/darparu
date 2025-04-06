@@ -28,18 +28,19 @@ void terminate() {
   glfwTerminate();
 }
 
-Renderer::Renderer(std::string window_name, int window_width, int window_height, std::shared_ptr<IoControl> control)
+Renderer::Renderer(std::string window_name, int window_width, int window_height, std::shared_ptr<IoControl> control,
+                   std::shared_ptr<Camera> camera)
     : Renderer(
           window_name, window_width, window_height,
           [](const ProjectionContext &context) {
             return perspective(radians(60), context.aspect_ratio, context.near_plane, context.far_plane);
           },
-          control) {}
+          control, camera) {}
 
 Renderer::Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function,
-                   std::shared_ptr<IoControl> control)
+                   std::shared_ptr<IoControl> control, std::shared_ptr<Camera> camera)
     : _window(create_window(window_name, window_width, window_height)), _projection_function(projection_function),
-      _io_control(control), _camera_texture(window_width, window_height), _renderables() {
+      _io_control(control), _camera(camera), _camera_texture(window_width, window_height), _renderables() {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -54,9 +55,9 @@ Renderer::Renderer(std::string window_name, int window_width, int window_height,
     renderable->set_view(_view);
   }
 
-  _camera._position = {2.5, 3.535534, 2.5};
-  _camera._radians[0] = 0.7853982;
-  _camera._radians[1] = 0.7853982;
+  _camera->_position = {2.5, 3.535534, 2.5};
+  _camera->_radians[0] = 0.7853982;
+  _camera->_radians[1] = 0.7853982;
 
   update_camera();
 }
@@ -65,8 +66,6 @@ Renderer::~Renderer() { glfwDestroyWindow(_window); }
 
 void Renderer::render() {
   glfwMakeContextCurrent(_window);
-
-  update_camera();
 
   _camera_texture.bind();
   GL_CALL(glClearColor(0.1, 0.1, 0.1, 1.0));
@@ -89,7 +88,7 @@ void Renderer::render() {
   }
 
   GL_CALL(glfwSwapBuffers(_window));
-  if (_io_control->update() && _io_control->control(_camera._position, _camera._radians))
+  if (_io_control->update() && _io_control->control(_camera->_position, _camera->_radians))
     update_camera();
 }
 
@@ -117,7 +116,7 @@ void Renderer::set_projection_function(ProjectionFunction projection_function) {
 }
 
 void Renderer::update_camera() {
-  _view = _camera.update();
+  _view = _camera->update();
   for (auto &[renderable, _] : _renderables)
     renderable->set_view(_view);
 }

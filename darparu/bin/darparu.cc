@@ -1,4 +1,5 @@
 #include "darparu/renderer/algebra.h"
+#include "darparu/renderer/cameras/orbit.h"
 #include "darparu/renderer/entities/ball.h"
 #include "darparu/renderer/entities/container.h"
 #include "darparu/renderer/entities/light.h"
@@ -27,7 +28,8 @@ struct BallConfig {
 int main(int argc, char *argv[]) {
   renderer::init();
 
-  renderer::Renderer renderer("Darparu", 1080, 1080, std::make_shared<renderer::Simple3DIoControl>());
+  renderer::Renderer renderer("Darparu", 1080, 1080, std::make_shared<renderer::Simple3DIoControl>(),
+                              std::make_shared<renderer::OrbitCamera>());
 
   std::vector<BallConfig> ball_configs = {{{1.0, 0.0, 0.0}, {-0.5, 1.0, -0.5}, 0.2},
                                           {{0.0, 1.0, 0.0}, {0.5, 1.0, -0.5}, 0.3},
@@ -54,7 +56,7 @@ int main(int argc, char *argv[]) {
   container->set_model(renderer::transpose(container_water_model));
   container->set_light_color({1.0, 1.0, 1.0});
   container->set_light_position(light_position);
-  container->set_view_position(renderer._camera._position);
+  container->set_view_position(renderer._camera->_position);
   container->set_view(renderer::eye4d());
   lambda.emplace_back(
       [container](const std::array<float, 3> &view_position) { container->set_view_position(view_position); });
@@ -69,7 +71,7 @@ int main(int argc, char *argv[]) {
     ball->set_light_color({1.0, 1.0, 1.0});
     ball->set_light_position(light_position);
 
-    ball->set_view_position(renderer._camera._position);
+    ball->set_view_position(renderer._camera->_position);
     ball->set_view(renderer::eye4d());
     const auto radius = ball_configs[sphere].radius;
     ball->set_model(renderer::transpose(renderer::translate(
@@ -95,7 +97,7 @@ int main(int argc, char *argv[]) {
   auto start = std::chrono::high_resolution_clock::now();
   while (!renderer.should_close()) {
     for (const auto &lambda : lambda) {
-      lambda(renderer._camera._position);
+      lambda(renderer._camera->_position);
     }
     renderer.render();
     auto end = std::chrono::high_resolution_clock::now();

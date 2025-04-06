@@ -1,4 +1,5 @@
 #include "darparu/renderer/algebra.h"
+#include "darparu/renderer/cameras/orbit.h"
 #include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/entities/plane.h"
 #include "darparu/renderer/entities/water.h"
@@ -24,13 +25,13 @@ int main(int argc, char *argv[]) {
       [](const renderer::ProjectionContext &context) {
         return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
       },
-      std::make_shared<renderer::Simple3DIoControl>());
-  renderer._camera._position = {0.0, 1.0, 0.0};
+      std::make_shared<renderer::Simple3DIoControl>(), std::make_shared<renderer::OrbitCamera>());
+  renderer._camera->_position = {0.0, 1.0, 0.0};
   std::array<float, 3> camera_focus = {0.0, 0.0, 0.0};
-  renderer._camera._radians[0] =
-      std::atan2(renderer._camera._position[1] - camera_focus[1], renderer._camera._position[0] - camera_focus[0]);
-  renderer._camera._radians[1] =
-      std::atan2(renderer._camera._position[1] - camera_focus[1], renderer._camera._position[2] - camera_focus[2]);
+  renderer._camera->_radians[0] =
+      std::atan2(renderer._camera->_position[1] - camera_focus[1], renderer._camera->_position[0] - camera_focus[0]);
+  renderer._camera->_radians[1] =
+      std::atan2(renderer._camera->_position[1] - camera_focus[1], renderer._camera->_position[2] - camera_focus[2]);
   renderer.update_camera();
 
   auto light = std::make_shared<renderer::entities::Light>();
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
   plane->set_model(renderer::transpose(plane_model));
   plane->set_light_color({1.0, 1.0, 1.0});
   plane->set_light_position(light_position);
-  plane->set_view_position(renderer._camera._position);
+  plane->set_view_position(renderer._camera->_position);
   plane->set_view(renderer::eye4d());
   lambda.emplace_back([plane](const std::array<float, 3> &view_position) { plane->set_view_position(view_position); });
 
@@ -78,7 +79,7 @@ int main(int argc, char *argv[]) {
   auto start = std::chrono::high_resolution_clock::now();
   while (!renderer.should_close()) {
     for (const auto &lambda : lambda) {
-      lambda(renderer._camera._position);
+      lambda(renderer._camera->_position);
     }
     renderer.render();
     auto end = std::chrono::high_resolution_clock::now();
