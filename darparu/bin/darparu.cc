@@ -26,7 +26,7 @@ struct BallConfig {
 int main(int argc, char *argv[]) {
   renderer::init();
 
-  renderer::Renderer renderer(1080, 1080, RESOLUTION, SPACING, WALL_THICKNESS);
+  renderer::Renderer renderer(1080, 1080);
 
   std::vector<BallConfig> ball_configs = {{{1.0, 0.0, 0.0}, {-0.5, 1.0, -0.5}, 0.2},
                                           {{0.0, 1.0, 0.0}, {0.5, 1.0, -0.5}, 0.3},

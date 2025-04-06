@@ -32,7 +32,8 @@ private:
   ProjectionContext _projection_context;
 
 public:
-  Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness);
+  Renderer(int window_width, int window_height, ProjectionFunction projection_function);
+  Renderer(int window_width, int window_height);
   ~Renderer();
 
   Camera _camera;

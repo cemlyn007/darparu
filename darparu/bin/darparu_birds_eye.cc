@@ -14,13 +14,11 @@ using namespace darparu;
 
 constexpr size_t RESOLUTION = 101;
 constexpr float SPACING = 0.02;
-constexpr float WALL_THICKNESS = 0.1;
 
 int main(int argc, char *argv[]) {
   renderer::init();
 
-  renderer::Renderer renderer(1080, 1080, RESOLUTION, SPACING, WALL_THICKNESS);
-  renderer.set_projection_function([](const renderer::ProjectionContext &context) {
+  renderer::Renderer renderer(1080, 1080, [](const renderer::ProjectionContext &context) {
     return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
   });
   renderer._camera_position = {0.0, 1.0, 0.0};

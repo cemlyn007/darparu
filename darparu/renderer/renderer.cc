@@ -29,12 +29,15 @@ void terminate() {
   glfwTerminate();
 }
 
-Renderer::Renderer(int window_width, int window_height, size_t resolution, float spacing, float wall_thickness)
-    : _window(create_window(window_width, window_height)), _escape_pressed(false),
-      _projection_function([](const ProjectionContext &context) {
+Renderer::Renderer(int window_width, int window_height)
+    : Renderer(window_width, window_height, [](const ProjectionContext &context) {
         return perspective(radians(60), context.aspect_ratio, context.near_plane, context.far_plane);
-      }),
-      _camera(window_width, window_height), _renderables(), _mouse_click(false) {
+      }) {}
+
+Renderer::Renderer(int window_width, int window_height, ProjectionFunction projection_function)
+    : _window(create_window(window_width, window_height)), _escape_pressed(false),
+      _projection_function(projection_function), _camera(window_width, window_height), _renderables(),
+      _mouse_click(false) {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
