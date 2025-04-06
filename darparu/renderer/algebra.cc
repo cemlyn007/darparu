@@ -163,6 +163,26 @@ std::array<float, 16> look_at(const std::array<float, 3> &eye, const std::array<
   return transpose(flat_result);
 }
 
+std::array<float, 16> orthographic(float left, float right, float bottom, float top, float near, float far) {
+  std::array<float, 16> matrix{};
+
+  // Diagonal (scale factors)
+  matrix[0] = 2.0f / (right - left); // X scale
+  matrix[5] = 2.0f / (top - bottom); // Y scale
+  matrix[10] = -2.0f / (far - near); // Z scale (negative for OpenGL's NDC)
+
+  // Translation components
+  matrix[12] = -(right + left) / (right - left); // X translate
+  matrix[13] = -(top + bottom) / (top - bottom); // Y translate
+  matrix[14] = -(far + near) / (far - near);     // Z translate
+
+  // Fixed values
+  matrix[15] = 1.0f; // Homogeneous coordinate
+
+  // Other elements are 0 (already initialized by std::array)
+  return matrix;
+}
+
 std::array<float, 16> perspective(float fov, float aspect, float near, float far) {
   float f = 1.0f / std::tan(fov / 2.0f);
   float nf = 1.0f / (near - far);

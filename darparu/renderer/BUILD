@@ -25,6 +25,7 @@ cc_library(
     deps = [
         ":algebra",
         ":gl_error_macro",
+        ":projection_context",
         ":renderable",
         ":shader",
         "//darparu/renderer:camera",
@@ -98,4 +99,9 @@ cc_library(
         "@glew//:glew_static",
         "@glfw",
     ],
+)
+
+cc_library(
+    name = "projection_context",
+    hdrs = ["projection_context.h"],
 )

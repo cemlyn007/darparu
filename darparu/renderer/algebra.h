@@ -32,6 +32,8 @@ std::array<float, 16> scale(const std::array<float, 16> &matrix, const std::arra
 std::array<float, 16> look_at(const std::array<float, 3> &eye, const std::array<float, 3> &center,
                               const std::array<float, 3> &up);
 
+std::array<float, 16> orthographic(float left, float right, float bottom, float top, float near, float far);
+
 std::array<float, 16> perspective(float fov, float aspect, float near, float far);
 
 std::array<float, 16> inverse(std::array<float, 16> matrix);

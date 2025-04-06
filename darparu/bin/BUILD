@@ -5,6 +5,8 @@ cc_binary(
     srcs = ["darparu_birds_eye.cc"],
     deps = [
         "//darparu/renderer",
+        "//darparu/renderer:algebra",
+        "//darparu/renderer:projection_context",
         "//darparu/renderer/entities:container",
         "//darparu/renderer/entities:light",
         "//darparu/renderer/entities:plane",

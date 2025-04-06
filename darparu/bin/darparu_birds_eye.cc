@@ -2,12 +2,12 @@
 #include "darparu/renderer/entities/light.h"
 #include "darparu/renderer/entities/plane.h"
 #include "darparu/renderer/entities/water.h"
+#include "darparu/renderer/projection_context.h"
 #include "darparu/renderer/renderer.h"
 #include "math.h"
 #include <chrono>
 #include <functional>
 #include <iostream>
-
 using namespace std::chrono_literals;
 
 using namespace darparu;
@@ -20,6 +20,16 @@ int main(int argc, char *argv[]) {
   renderer::init();
 
   renderer::Renderer renderer(1080, 1080, RESOLUTION, SPACING, WALL_THICKNESS);
+  renderer.set_projection_function([](const renderer::ProjectionContext &context) {
+    return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
+  });
+  renderer._camera_position = {0.0, 1.0, 0.0};
+  std::array<float, 3> camera_focus = {0.0, 0.0, 0.0};
+  renderer._camera_radians[0] =
+      std::atan2(renderer._camera_position[1] - camera_focus[1], renderer._camera_position[0] - camera_focus[0]);
+  renderer._camera_radians[1] =
+      std::atan2(renderer._camera_position[1] - camera_focus[1], renderer._camera_position[2] - camera_focus[2]);
+  renderer.update_camera();
 
   auto light = std::make_shared<renderer::entities::Light>();
   renderer._renderables.emplace_back(light, true);
