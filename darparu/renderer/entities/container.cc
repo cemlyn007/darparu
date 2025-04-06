@@ -73,7 +73,7 @@ MeshData create_mesh(float size, float wall_thickness) {
   mesh.vertices = {0, 0, 0, 0, size, 0, size, 0, 0, 0, size, 0, size, 0, size, 0, size, 0, 0, 0, size, 0, size, 0};
   mesh.indices = {2, 1, 0, 0, 3, 2};
 
-  for (size_t i = 0; i < mesh.vertices.size(); i += 3) {
+  for (size_t i = 0; i < mesh.vertices.size(); i += 6) {
     mesh.vertices[i] -= size / 2;
     mesh.vertices[i + 2] -= size / 2;
   }
