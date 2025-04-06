@@ -29,13 +29,13 @@ void terminate() {
   glfwTerminate();
 }
 
-Renderer::Renderer(int window_width, int window_height)
-    : Renderer(window_width, window_height, [](const ProjectionContext &context) {
+Renderer::Renderer(std::string window_name, int window_width, int window_height)
+    : Renderer(window_name, window_width, window_height, [](const ProjectionContext &context) {
         return perspective(radians(60), context.aspect_ratio, context.near_plane, context.far_plane);
       }) {}
 
-Renderer::Renderer(int window_width, int window_height, ProjectionFunction projection_function)
-    : _window(create_window(window_width, window_height)), _escape_pressed(false),
+Renderer::Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function)
+    : _window(create_window(window_name, window_width, window_height)), _escape_pressed(false),
       _projection_function(projection_function), _camera(window_width, window_height), _renderables(),
       _mouse_click(false) {
 
@@ -152,8 +152,8 @@ std::array<float, 3> Renderer::get_cursor_direction() {
   return arr;
 };
 
-GLFWwindow *Renderer::create_window(int width, int height) {
-  GLFWwindow *window = glfwCreateWindow(width, height, "Water Simulator", nullptr, nullptr);
+GLFWwindow *Renderer::create_window(std::string window_name, int width, int height) {
+  GLFWwindow *window = glfwCreateWindow(width, height, window_name.c_str(), nullptr, nullptr);
   if (!window) {
     throw std::runtime_error("Could not create window");
   }

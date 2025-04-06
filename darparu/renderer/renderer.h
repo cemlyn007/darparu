@@ -4,6 +4,7 @@
 #include "darparu/renderer/renderable.h"
 #include <GLFW/glfw3.h>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace darparu::renderer {
@@ -32,8 +33,8 @@ private:
   ProjectionContext _projection_context;
 
 public:
-  Renderer(int window_width, int window_height, ProjectionFunction projection_function);
-  Renderer(int window_width, int window_height);
+  Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function);
+  Renderer(std::string window_name, int window_width, int window_height);
   ~Renderer();
 
   Camera _camera;
@@ -56,7 +57,7 @@ private:
   void update_projection();
   void update_camera(bool rotate_camera);
 
-  GLFWwindow *create_window(int width, int height);
+  GLFWwindow *create_window(std::string window_name, int width, int height);
   static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
   static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
   static void cursor_position_callback(GLFWwindow *window, double xpos, double ypos);
