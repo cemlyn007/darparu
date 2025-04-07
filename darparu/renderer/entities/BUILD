@@ -60,6 +60,22 @@ cc_library(
 )
 
 cc_library(
+    name = "mesh_2d",
+    srcs = ["mesh_2d.cc"],
+    hdrs = ["mesh_2d.h"],
+    data = ["//darparu/renderer/shaders:simple_2d"],
+    linkopts = opengl_linkopts,
+    deps = [
+        "//darparu/renderer:gl_error_macro",
+        "//darparu/renderer:renderable",
+        "//darparu/renderer:shader",
+        "//darparu/renderer:shader_context_manager",
+        "@glew//:glew_static",
+        "@glfw",
+    ],
+)
+
+cc_library(
     name = "plane",
     srcs = ["plane.cc"],
     hdrs = ["plane.h"],

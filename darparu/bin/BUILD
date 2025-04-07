@@ -29,3 +29,16 @@ cc_binary(
         "//darparu/renderer/io_controls:simple_3d",
     ],
 )
+
+cc_binary(
+    name = "voronoi",
+    srcs = ["voronoi.cc"],
+    deps = [
+        "//darparu/renderer",
+        "//darparu/renderer:algebra",
+        "//darparu/renderer:projection_context",
+        "//darparu/renderer/cameras:pan",
+        "//darparu/renderer/entities:mesh_2d",
+        "//darparu/renderer/io_controls:simple_2d",
+    ],
+)

@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
   renderer::Renderer renderer(
       "Darparu", 1080, 1080,
       [](const renderer::ProjectionContext &context) {
-        return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
+        return renderer::orthographic(-0.5, 0.5, -0.5, 0.5, context.near_plane, context.far_plane);
       },
       std::make_shared<renderer::Simple2DIoControl>(-0.001, -10.0),
       std::make_shared<renderer::PanCamera>(std::array<float, 3>{0.0, 0.0, -5.0}));
