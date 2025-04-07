@@ -8,6 +8,10 @@ namespace darparu::renderer {
 class OrbitCamera : public Camera {
 public:
   OrbitCamera() = default;
+  OrbitCamera(std::array<float, 3> position, std::array<float, 2> radians) {
+    _position = position;
+    _radians = radians;
+  };
   ~OrbitCamera() = default;
 
   virtual std::array<float, 16> update() {

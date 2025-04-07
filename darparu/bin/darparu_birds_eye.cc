@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
 using namespace darparu;
 
 constexpr size_t RESOLUTION = 101;
-constexpr float SPACING = 0.001;
+constexpr float SPACING = 0.002;
 
 int main(int argc, char *argv[]) {
   renderer::init();
@@ -25,7 +25,8 @@ int main(int argc, char *argv[]) {
       [](const renderer::ProjectionContext &context) {
         return renderer::orthographic(-5.0, 5.0, -5.0, 5.0, context.near_plane, context.far_plane);
       },
-      std::make_shared<renderer::Simple2DIoControl>(), std::make_shared<renderer::PanCamera>());
+      std::make_shared<renderer::Simple2DIoControl>(-0.001, -10.0),
+      std::make_shared<renderer::PanCamera>(std::array<float, 3>{0.0, 0.0, -5.0}));
   auto light = std::make_shared<renderer::entities::Light>();
   renderer._renderables.emplace_back(light, false);
   auto light_position = std::array<float, 3>{0.0, 0.0, -0.5};

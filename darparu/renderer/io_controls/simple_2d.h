@@ -6,7 +6,7 @@ namespace darparu::renderer {
 
 class Simple2DIoControl : public IoControl {
 public:
-  Simple2DIoControl() = default;
+  Simple2DIoControl(float near_plane, float far_plane) : _near_plane(near_plane), _far_plane(far_plane) {}
   virtual ~Simple2DIoControl() = default;
 
   bool control(std::array<float, 3> &camera_position, std::array<float, 2> &camera_radians) override {
@@ -22,13 +22,13 @@ public:
     if (_scroll_offset != 0.0) {
       camera_changed = true;
       camera_position[2] =
-          std::fmax(-_far_plane, std::min(-_near_plane, static_cast<float>(camera_position[2] - _scroll_offset)));
+          std::fmax(_far_plane, std::min(_near_plane, static_cast<float>(camera_position[2] - _scroll_offset)));
     }
     return camera_changed;
   }
 
 private:
-  float _near_plane = 0.1f;
-  float _far_plane = 100.0f;
+  float _near_plane = -0.1f;
+  float _far_plane = -100.0f;
 };
 } // namespace darparu::renderer

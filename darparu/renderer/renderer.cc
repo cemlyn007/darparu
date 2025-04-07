@@ -55,10 +55,8 @@ Renderer::Renderer(std::string window_name, int window_width, int window_height,
     renderable->set_view(_view);
   }
 
-  _camera->_position = {2.5, 3.535534, 2.5};
-  _camera->_radians[0] = 0.7853982;
-  _camera->_radians[1] = 0.7853982;
-
+  _io_control->update();
+  _io_control->control(_camera->_position, _camera->_radians);
   update_camera();
   _camera_texture.unbind();
 }

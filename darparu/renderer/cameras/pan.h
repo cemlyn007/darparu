@@ -7,6 +7,7 @@ namespace darparu::renderer {
 class PanCamera : public Camera {
 public:
   PanCamera() = default;
+  PanCamera(std::array<float, 3> position) { _position = position; };
   ~PanCamera() = default;
 
   virtual std::array<float, 16> update() {
