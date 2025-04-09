@@ -111,11 +111,10 @@ int main() {
   renderer::Renderer renderer(
       "Darparu", 1080, 1080,
       [](const renderer::ProjectionContext &context) {
-        return renderer::orthographic(-0.5, 0.5, -0.5, 0.5, context.near_plane, context.far_plane);
+        return renderer::orthographic(-0.25, 0.25, -0.25, 0.25, context.near_plane, context.far_plane);
       },
       std::make_shared<renderer::Simple2DIoControl>(-0.001, -10.0),
-      std::make_shared<renderer::PanCamera>(std::array<float, 3>{0.0, 0.0, -5.0}));
-
+      std::make_shared<renderer::PanCamera>(std::array<float, 3>{51, 0.126, -20.0}), -1000.0, 1000.0);
   auto mesh = std::make_shared<renderer::entities::Mesh2d>(vertices, indices, colors);
   renderer._renderables.emplace_back(mesh, false);
   mesh->set_projection(renderer::eye4d());

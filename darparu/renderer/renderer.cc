@@ -29,18 +29,20 @@ void terminate() {
 }
 
 Renderer::Renderer(std::string window_name, int window_width, int window_height, std::shared_ptr<IoControl> control,
-                   std::shared_ptr<Camera> camera)
+                   std::shared_ptr<Camera> camera, float near_plane, float far_plane)
     : Renderer(
           window_name, window_width, window_height,
           [](const ProjectionContext &context) {
             return perspective(radians(60), context.aspect_ratio, context.near_plane, context.far_plane);
           },
-          control, camera) {}
+          control, camera, near_plane, far_plane) {}
 
 Renderer::Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function,
-                   std::shared_ptr<IoControl> control, std::shared_ptr<Camera> camera)
+                   std::shared_ptr<IoControl> control, std::shared_ptr<Camera> camera, float near_plane,
+                   float far_plane)
     : _window(create_window(window_name, window_width, window_height)), _projection_function(projection_function),
-      _io_control(control), _camera(camera), _camera_texture(window_width, window_height), _renderables() {
+      _io_control(control), _camera(camera), _camera_texture(window_width, window_height), _renderables(),
+      _near_plane(near_plane), _far_plane(far_plane) {
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

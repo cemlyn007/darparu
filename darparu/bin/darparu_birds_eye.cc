@@ -25,8 +25,8 @@ int main(int argc, char *argv[]) {
       [](const renderer::ProjectionContext &context) {
         return renderer::orthographic(-0.5, 0.5, -0.5, 0.5, context.near_plane, context.far_plane);
       },
-      std::make_shared<renderer::Simple2DIoControl>(-0.001, -10.0),
-      std::make_shared<renderer::PanCamera>(std::array<float, 3>{0.0, 0.0, -5.0}));
+      std::make_shared<renderer::Simple2DIoControl>(-100.0, -0.001),
+      std::make_shared<renderer::PanCamera>(std::array<float, 3>{0.0, 0.0, -100.0}), -1000.0, 1000.0);
   auto light = std::make_shared<renderer::entities::Light>();
   renderer._renderables.emplace_back(light, false);
   auto light_position = std::array<float, 3>{0.0, 0.0, -0.5};

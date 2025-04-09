@@ -22,13 +22,13 @@ public:
     if (_scroll_offset != 0.0) {
       camera_changed = true;
       camera_position[2] =
-          std::fmax(_far_plane, std::min(_near_plane, static_cast<float>(camera_position[2] - _scroll_offset)));
+          std::fmax(_near_plane, std::min(_far_plane, static_cast<float>(camera_position[2] - _scroll_offset)));
     }
     return camera_changed;
   }
 
 private:
-  float _near_plane = -0.1f;
-  float _far_plane = -100.0f;
+  float _near_plane = 0.1f;
+  float _far_plane = 100.0f;
 };
 } // namespace darparu::renderer

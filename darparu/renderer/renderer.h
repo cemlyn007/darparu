@@ -30,9 +30,9 @@ private:
 
 public:
   Renderer(std::string window_name, int window_width, int window_height, ProjectionFunction projection_function,
-           std::shared_ptr<IoControl> control, std::shared_ptr<Camera> camera);
+           std::shared_ptr<IoControl> control, std::shared_ptr<Camera> camera, float near_plane, float far_plane);
   Renderer(std::string window_name, int window_width, int window_height, std::shared_ptr<IoControl> control,
-           std::shared_ptr<Camera> camera);
+           std::shared_ptr<Camera> camera, float near_plane, float far_plane);
   ~Renderer();
 
   std::shared_ptr<IoControl> _io_control;
@@ -47,8 +47,8 @@ public:
   void set_projection_function(ProjectionFunction projection_function);
 
 private:
-  float _near_plane = 0.01f;
-  float _far_plane = 100.0f;
+  float _near_plane;
+  float _far_plane;
 
   void on_framebuffer_shape_change();
   void update_projection();
