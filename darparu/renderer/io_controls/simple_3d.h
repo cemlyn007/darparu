@@ -9,7 +9,7 @@ public:
   Simple3DIoControl() = default;
   virtual ~Simple3DIoControl() = default;
 
-  bool control(std::array<float, 3> &camera_position, std::array<float, 2> &camera_radians) override {
+  bool control(std::array<float, 3> &camera_position, std::array<float, 2> &camera_radians, float &zoom) override {
     bool camera_changed = false;
     if (_escape_pressed) {
       return camera_changed;

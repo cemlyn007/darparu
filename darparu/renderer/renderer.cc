@@ -58,7 +58,7 @@ Renderer::Renderer(std::string window_name, int window_width, int window_height,
   }
 
   _io_control->update();
-  _io_control->control(_camera->_position, _camera->_radians);
+  _io_control->control(_camera->_position, _camera->_radians, _camera->_zoom);
   update_camera();
   _camera_texture.unbind();
 }
@@ -89,8 +89,10 @@ void Renderer::render() {
   }
 
   GL_CALL(glfwSwapBuffers(_window));
-  if (_io_control->update() && _io_control->control(_camera->_position, _camera->_radians))
+  if (_io_control->update() && _io_control->control(_camera->_position, _camera->_radians, _camera->_zoom)) {
+    update_projection();
     update_camera();
+  }
 }
 
 void Renderer::on_framebuffer_shape_change() {
@@ -104,9 +106,8 @@ void Renderer::update_projection() {
   _projection_context.aspect_ratio = static_cast<float>(_framebuffer_width) / static_cast<float>(_framebuffer_height);
   _projection_context.near_plane = _near_plane;
   _projection_context.far_plane = _far_plane;
-
+  _projection_context.zoom = _camera->_zoom;
   _projection = _projection_function(_projection_context);
-
   for (auto &[renderable, _] : _renderables)
     renderable->set_projection(_projection);
 }

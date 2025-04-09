@@ -42,3 +42,16 @@ cc_binary(
         "//darparu/renderer/io_controls:simple_2d",
     ],
 )
+
+cc_binary(
+    name = "triangle_2d",
+    srcs = ["triangle_2d.cc"],
+    deps = [
+        "//darparu/renderer",
+        "//darparu/renderer:algebra",
+        "//darparu/renderer:projection_context",
+        "//darparu/renderer/cameras:pan",
+        "//darparu/renderer/entities:mesh_2d",
+        "//darparu/renderer/io_controls:simple_2d",
+    ],
+)

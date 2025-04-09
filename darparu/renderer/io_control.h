@@ -19,7 +19,9 @@ public:
   double _last_mouse_position_in_pixels[2] = {0.0, 0.0};
   double _mouse_position_change_in_pixels[2] = {0.0, 0.0};
 
-  bool virtual control(std::array<float, 3> &camera_position, std::array<float, 2> &camera_radians) { return false; };
+  bool virtual control(std::array<float, 3> &camera_position, std::array<float, 2> &camera_radians, float &zoom) {
+    return false;
+  };
 
 private:
   bool _event = false;

@@ -7,6 +7,7 @@
 #include "math.h"
 #include <algorithm>
 #include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -35,9 +36,9 @@ std::vector<std::vector<float>> load_voronoi_faces(const std::string &file_path)
     while (std::getline(ss, cell, ',')) {
       // Remove quotes and split "x,y" into two floats
       cell.erase(remove(cell.begin(), cell.end(), '"'), cell.end());
-      std::stringstream pairStream(cell);
+      std::stringstream pair_stream(cell);
       std::string value;
-      while (std::getline(pairStream, value, ',')) {
+      while (std::getline(pair_stream, value, ',')) {
         row.push_back(std::stof(value));
       }
     }
@@ -77,9 +78,9 @@ int main() {
     // Triangular the row and store the vertices in the vertices vector
     std::vector<std::vector<float>> triangles = triangulate_polygon(row);
     // Generate colors for each triangle based on the current region index
-    float r = std::fmod(static_cast<double>(voronoi_index) / (static_cast<double>(num_regions) / 3.0), 1.0);
-    float g = std::fmod(static_cast<double>(voronoi_index) / (static_cast<double>(num_regions) / 2.0), 1.0);
-    float b = static_cast<double>(voronoi_index) / (static_cast<double>(num_regions));
+    float r = std::rand() % 256 / 255.0;
+    float g = std::rand() % 256 / 255.0;
+    float b = std::rand() % 256 / 255.0;
     for (const auto &tri : triangles) {
       vertices.insert(vertices.end(), tri.begin(), tri.end());
       // Generate indices for the triangles
@@ -111,9 +112,11 @@ int main() {
   renderer::Renderer renderer(
       "Darparu", 1080, 1080,
       [](const renderer::ProjectionContext &context) {
-        return renderer::orthographic(-0.25, 0.25, -0.25, 0.25, context.near_plane, context.far_plane);
+        return renderer::orthographic(-0.5f * context.zoom, 0.5f * context.zoom, // left, right
+                                      -0.5f * context.zoom, 0.5f * context.zoom, // bottom, top
+                                      context.near_plane, context.far_plane);
       },
-      std::make_shared<renderer::Simple2DIoControl>(-0.001, -10.0),
+      std::make_shared<renderer::Simple2DIoControl>(),
       std::make_shared<renderer::PanCamera>(std::array<float, 3>{51, 0.126, -20.0}), -1000.0, 1000.0);
   auto mesh = std::make_shared<renderer::entities::Mesh2d>(vertices, indices, colors);
   renderer._renderables.emplace_back(mesh, false);

@@ -30,7 +30,8 @@ int main(int argc, char *argv[]) {
 
   renderer::Renderer renderer("Darparu", 1080, 1080, std::make_shared<renderer::Simple3DIoControl>(),
                               std::make_shared<renderer::OrbitCamera>(std::array<float, 3>{{2.5, 3.535534, 2.5}},
-                                                                      std::array<float, 2>{{0.7853982, 0.7853982}}));
+                                                                      std::array<float, 2>{{0.7853982, 0.7853982}}),
+                              0.001, 100.0);
 
   std::vector<BallConfig> ball_configs = {{{1.0, 0.0, 0.0}, {-0.5, 1.0, -0.5}, 0.2},
                                           {{0.0, 1.0, 0.0}, {0.5, 1.0, -0.5}, 0.3},
