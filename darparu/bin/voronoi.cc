@@ -98,7 +98,7 @@ int main() {
                                       -0.5f * context.zoom, 0.5f * context.zoom, // bottom, top
                                       context.near_plane, context.far_plane);
       },
-      std::make_shared<renderer::Simple2DIoControl>(),
+      std::make_shared<renderer::Simple2DIoControl>(0.01, 0.01),
       std::make_shared<renderer::PanCamera>(std::array<float, 3>{-0.126, 51, -20.0}), -1000.0, 1000.0);
   auto mesh = std::make_shared<renderer::entities::Mesh2d>(vertices, indices, colors);
   renderer._renderables.emplace_back(mesh, false);
