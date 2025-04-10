@@ -42,3 +42,15 @@ http_archive(
 )
 
 bazel_dep(name = "glew", version = "2.2.0")
+
+#-------------------------------------------------------------
+# freetype
+#-------------------------------------------------------------
+FREETYPE_VERSION = "2.13.3"
+http_archive(
+    name = "freetype",
+    build_file = "@//third_party/freetype:BUILD",
+    integrity = "sha256-XDqOePeyTCCyW1TuV11tqkAAel9O6ihFhhw0CbMCF0c=",
+    strip_prefix = "freetype-{}".format(FREETYPE_VERSION),
+    urls = ["https://download.savannah.gnu.org/releases/freetype/freetype-{}.tar.gz".format(FREETYPE_VERSION)],
+)
