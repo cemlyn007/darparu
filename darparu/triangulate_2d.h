@@ -1,18 +1,7 @@
 #pragma once
-#include "darparu/renderer/algebra.h"
-#include "darparu/renderer/cameras/pan.h"
-#include "darparu/renderer/entities/mesh_2d.h"
-#include "darparu/renderer/io_controls/simple_2d.h"
-#include "darparu/renderer/projection_context.h"
-#include "darparu/renderer/renderer.h"
-#include "math.h"
-#include <algorithm>
-#include <chrono>
-#include <cstdlib>
 #include <deque>
-#include <fstream>
 #include <iostream>
-#include <sstream>
+#include <limits>
 #include <vector>
 
 // Kudos to Claude 3.7 Sonnet thinking and whoever fed the beast.
@@ -21,32 +10,32 @@ std::vector<std::vector<double>> triangulate_polygon(const std::vector<double> &
   std::vector<std::vector<double>> triangles;
 
   // Need at least 3 vertices to form a triangle
-  const size_t vertexCount = vertices.size() / 2;
-  if (vertexCount < 3)
+  const size_t vertex_count = vertices.size() / 2;
+  if (vertex_count < 3)
     return triangles;
 
   // Special case: if we already have a triangle, return it directly
-  if (vertexCount == 3) {
+  if (vertex_count == 3) {
     triangles.push_back(vertices);
     return triangles;
   }
 
   // Create a deque containing vertex indices for easier manipulation
   std::deque<int> remaining;
-  for (size_t i = 0; i < vertexCount; i++) {
+  for (size_t i = 0; i < vertex_count; i++) {
     remaining.push_back(i);
   }
 
   // Determine polygon orientation (CCW is positive area)
-  double signedArea = 0.0f;
-  for (size_t i = 0; i < vertexCount; i++) {
-    const size_t j = (i + 1) % vertexCount;
-    signedArea += vertices[2 * i] * vertices[2 * j + 1] - vertices[2 * j] * vertices[2 * i + 1];
+  double signed_area = 0.0f;
+  for (size_t i = 0; i < vertex_count; i++) {
+    const size_t j = (i + 1) % vertex_count;
+    signed_area += vertices[2 * i] * vertices[2 * j + 1] - vertices[2 * j] * vertices[2 * i + 1];
   }
-  const bool isCCW = (signedArea > 0.0f);
+  const bool is_ccw = (signed_area > 0.0f);
 
   // Helper function to compute the cross product (z component) of vectors (p2-p1) and (p3-p1)
-  auto crossProduct = [&](int i1, int i2, int i3) -> double {
+  auto cross_product = [&](int i1, int i2, int i3) -> double {
     const double x1 = vertices[2 * i1], y1 = vertices[2 * i1 + 1];
     const double x2 = vertices[2 * i2], y2 = vertices[2 * i2 + 1];
     const double x3 = vertices[2 * i3], y3 = vertices[2 * i3 + 1];
@@ -54,13 +43,13 @@ std::vector<std::vector<double>> triangulate_polygon(const std::vector<double> &
   };
 
   // Helper function to check if a vertex is convex
-  auto isVertexConvex = [&](int prev, int curr, int next) -> bool {
-    const double cross = crossProduct(prev, curr, next);
-    return isCCW ? (cross > 0) : (cross < 0);
+  auto is_vertex_convex = [&](int prev, int curr, int next) -> bool {
+    const double cross = cross_product(prev, curr, next);
+    return is_ccw ? (cross > 0) : (cross < 0);
   };
 
   // Helper function to check if point p is inside the triangle formed by a,b,c
-  auto isPointInTriangle = [&](int p, int a, int b, int c) -> bool {
+  auto is_point_in_triangle = [&](int p, int a, int b, int c) -> bool {
     // Skip if the test point is one of the triangle vertices
     if (p == a || p == b || p == c)
       return false;
@@ -72,14 +61,14 @@ std::vector<std::vector<double>> triangulate_polygon(const std::vector<double> &
     const double x3 = vertices[2 * c], y3 = vertices[2 * c + 1];
 
     // Compute edge vectors and point-to-vertex vectors
-    auto sideTest = [](double px, double py, double x1, double y1, double x2, double y2) -> double {
+    auto side_test = [](double px, double py, double x1, double y1, double x2, double y2) -> double {
       return (px - x2) * (y1 - y2) - (x1 - x2) * (py - y2);
     };
 
     // Check if point is on the same side of all edges
-    double s1 = sideTest(x, y, x1, y1, x2, y2);
-    double s2 = sideTest(x, y, x2, y2, x3, y3);
-    double s3 = sideTest(x, y, x3, y3, x1, y1);
+    double s1 = side_test(x, y, x1, y1, x2, y2);
+    double s2 = side_test(x, y, x2, y2, x3, y3);
+    double s3 = side_test(x, y, x3, y3, x1, y1);
 
     // If signs are all the same, point is inside
     const double epsilon = 1e-6f;
@@ -92,33 +81,33 @@ std::vector<std::vector<double>> triangulate_polygon(const std::vector<double> &
   };
 
   // Prevent infinite loops
-  const size_t maxIterations = vertexCount * 2;
+  const size_t max_iterations = vertex_count * 2;
   size_t iterations = 0;
-  size_t failSafeCounter = 0; // Additional counter to prevent getting stuck
+  size_t fail_safe_counter = 0; // Additional counter to prevent getting stuck
 
   // Pre-check for degenerate cases
-  bool hasDegeneracies = false;
-  for (size_t i = 0; i < vertexCount; i++) {
-    size_t next = (i + 1) % vertexCount;
+  bool has_degeneracies = false;
+  for (size_t i = 0; i < vertex_count; i++) {
+    size_t next = (i + 1) % vertex_count;
     double dx = vertices[2 * i] - vertices[2 * next];
     double dy = vertices[2 * i + 1] - vertices[2 * next + 1];
     if (std::abs(dx) < 1e-6f && std::abs(dy) < 1e-6f) {
-      hasDegeneracies = true;
+      has_degeneracies = true;
       break;
     }
   }
 
-  if (hasDegeneracies) {
+  if (has_degeneracies) {
     std::cerr << "Warning: Degenerate polygon detected (repeated vertices)" << std::endl;
   }
 
   // Ear clipping algorithm
-  while (remaining.size() > 3 && iterations < maxIterations) {
+  while (remaining.size() > 3 && iterations < max_iterations) {
     iterations++;
-    bool earFound = false;
+    bool ear_found = false;
 
     // If we've tried too many times without progress, use a fallback approach
-    if (failSafeCounter > remaining.size() * 2) {
+    if (fail_safe_counter > remaining.size() * 2) {
       std::cerr << "Warning: Using fallback triangulation for a difficult region" << std::endl;
       // Simple fan triangulation as fallback
       if (remaining.size() >= 3) {
@@ -135,83 +124,83 @@ std::vector<std::vector<double>> triangulate_polygon(const std::vector<double> &
     // Try to find an ear in the current polygon
     for (size_t i = 0; i < remaining.size(); i++) {
       // Get three consecutive vertices
-      const size_t prevIdx = (i + remaining.size() - 1) % remaining.size();
-      const size_t currIdx = i;
-      const size_t nextIdx = (i + 1) % remaining.size();
+      const size_t prev_idx = (i + remaining.size() - 1) % remaining.size();
+      const size_t curr_idx = i;
+      const size_t next_idx = (i + 1) % remaining.size();
 
-      const int prev = remaining[prevIdx];
-      const int curr = remaining[currIdx];
-      const int next = remaining[nextIdx];
+      const int prev = remaining[prev_idx];
+      const int curr = remaining[curr_idx];
+      const int next = remaining[next_idx];
 
       // Check if the vertex is convex
-      if (!isVertexConvex(prev, curr, next)) {
+      if (!is_vertex_convex(prev, curr, next)) {
         continue;
       }
 
       // Check if this is an ear (no other vertex inside the triangle)
-      bool isEar = true;
+      bool is_ear = true;
       for (size_t j = 0; j < remaining.size(); j++) {
-        if (j == prevIdx || j == currIdx || j == nextIdx)
+        if (j == prev_idx || j == curr_idx || j == next_idx)
           continue;
 
-        if (isPointInTriangle(remaining[j], prev, curr, next)) {
-          isEar = false;
+        if (is_point_in_triangle(remaining[j], prev, curr, next)) {
+          is_ear = false;
           break;
         }
       }
 
-      if (isEar) {
+      if (is_ear) {
         // We found an ear, add the triangle to our list
         triangles.push_back({vertices[2 * prev], vertices[2 * prev + 1], vertices[2 * curr], vertices[2 * curr + 1],
                              vertices[2 * next], vertices[2 * next + 1]});
 
         // Remove the ear vertex
-        remaining.erase(remaining.begin() + currIdx);
-        earFound = true;
-        failSafeCounter = 0; // Reset the fail safe counter
+        remaining.erase(remaining.begin() + curr_idx);
+        ear_found = true;
+        fail_safe_counter = 0; // Reset the fail safe counter
         break;
       }
     }
 
     // No ear found, this may happen with degenerate polygons
-    if (!earFound) {
-      failSafeCounter++; // Increment failsafe to eventually trigger fallback
+    if (!ear_found) {
+      fail_safe_counter++; // Increment failsafe to eventually trigger fallback
 
       // Handle the case where no ear is initially found by relaxing constraints
-      if (failSafeCounter > remaining.size()) {
+      if (fail_safe_counter > remaining.size()) {
         // Find the most convex vertex and clip it anyway
-        double bestConvexity = -std::numeric_limits<double>::max();
-        size_t bestIdx = 0;
+        double best_convexity = -std::numeric_limits<double>::max();
+        size_t best_idx = 0;
 
         for (size_t i = 0; i < remaining.size(); i++) {
-          const size_t prevIdx = (i + remaining.size() - 1) % remaining.size();
-          const size_t nextIdx = (i + 1) % remaining.size();
+          const size_t prev_idx = (i + remaining.size() - 1) % remaining.size();
+          const size_t next_idx = (i + 1) % remaining.size();
 
-          const int prev = remaining[prevIdx];
+          const int prev = remaining[prev_idx];
           const int curr = remaining[i];
-          const int next = remaining[nextIdx];
+          const int next = remaining[next_idx];
 
-          double convexity = crossProduct(prev, curr, next);
-          if (isCCW)
+          double convexity = cross_product(prev, curr, next);
+          if (is_ccw)
             convexity = -convexity; // Adjust for orientation
 
-          if (convexity > bestConvexity) {
-            bestConvexity = convexity;
-            bestIdx = i;
+          if (convexity > best_convexity) {
+            best_convexity = convexity;
+            best_idx = i;
           }
         }
 
         // Create a triangle with the best vertex
-        const size_t prevIdx = (bestIdx + remaining.size() - 1) % remaining.size();
-        const size_t nextIdx = (bestIdx + 1) % remaining.size();
+        const size_t prev_idx = (best_idx + remaining.size() - 1) % remaining.size();
+        const size_t next_idx = (best_idx + 1) % remaining.size();
 
-        triangles.push_back({vertices[2 * remaining[prevIdx]], vertices[2 * remaining[prevIdx] + 1],
-                             vertices[2 * remaining[bestIdx]], vertices[2 * remaining[bestIdx] + 1],
-                             vertices[2 * remaining[nextIdx]], vertices[2 * remaining[nextIdx] + 1]});
+        triangles.push_back({vertices[2 * remaining[prev_idx]], vertices[2 * remaining[prev_idx] + 1],
+                             vertices[2 * remaining[best_idx]], vertices[2 * remaining[best_idx] + 1],
+                             vertices[2 * remaining[next_idx]], vertices[2 * remaining[next_idx] + 1]});
 
-        remaining.erase(remaining.begin() + bestIdx);
-        earFound = true;
-        failSafeCounter = 0;
+        remaining.erase(remaining.begin() + best_idx);
+        ear_found = true;
+        fail_safe_counter = 0;
       }
     }
   }
