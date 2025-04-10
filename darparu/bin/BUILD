@@ -34,6 +34,7 @@ cc_binary(
     name = "voronoi",
     srcs = ["voronoi.cc"],
     deps = [
+        "//darparu:triangulate_2d",
         "//darparu/renderer",
         "//darparu/renderer:algebra",
         "//darparu/renderer:projection_context",
